@@ -1,56 +1,78 @@
+function data = data()
+% DATA  Central data file for the MDA loop.
+%
+%   data = data()
+%
+%   All constants and fixed parameters for the analysis live here.
+%   Group them by discipline. The engine_cycle function reads from
+%   the fields defined in the [ENGINE] section — do not rename those.
 
-classdef TestAC
+% =========================================================================
+%   MISSION / FLIGHT CONDITIONS
+% =========================================================================
+data.altitude_m     = 11000;        % cruise altitude                   (m)
+data.T_amb          = 216.5;        % ambient static temperature        (K)
+data.p_amb          = 22632.0;      % ambient static pressure           (Pa)
+data.rho_amb        = data.p_amb / (287.0 * data.T_amb);  % air density (kg/m^3)
 
-    properties (Constant)
-        name = "testAC"
-        % wing material
-        material = struct("E_modulus", 7.1e10, ...  % [Pa]
-                          "density", 2800, ...      % [Kg/m3]
-                          "tens_stress", 4.8e8, ... % [Pa]
-                          "comp_stress", 4.6e8)     % [Pa]
-        
-        % airfoil file
-        af_fpath = "data/BACXXX.dat"
-        nCST    = 6
-        % wing
-        AR = 6.61   % [-]
-        b  = 29   % [m]
-        sweep_LE = 38.3 % [deg]
-        taper  = 0.255 % [-]
-        b0 = 4.06 % [m] 14% of the span
-        sweep_kink = 0.01 % [deg]
-        dihedral = -3 % [deg]
-        twist_k = -1.2 % [deg]
-        twist_t = -3 % [deg]
-        incidence = 1 % [deg]
+% =========================================================================
+%   AIRCRAFT / WEIGHTS
+% =========================================================================
+data.g              = 9.80665;      % gravitational acceleration        (m/s^2)
+data.W_start        = 600000;       % aircraft weight at start of cruise (N)  (~71 t)
+% data.MTOW           = ;           % max take-off weight               (kg)
+% data.OEW            = ;           % operating empty weight            (kg)
+% data.payload        = ;           % design payload                    (kg)
+% data.W_fuel         = ;           % fuel weight                       (kg)
 
-        spar_LE = 0.2 % [x/c]
-        spar_TE = 0.8 % [x/c]
-        panel_eff = 0.96 % [-]
-        rib_pitch = 0.5 % [m]
+% =========================================================================
+%   AERODYNAMICS
+% =========================================================================
+data.CL_CD          = 18.0;         % cruise lift-to-drag ratio         (-)
+% data.S_ref          = ;           % reference wing area               (m^2)
+% data.AR             = ;           % aspect ratio                      (-)
+% data.e              = ;           % Oswald efficiency factor          (-)
+% data.CD0            = ;           % zero-lift drag coefficient        (-)
+% data.CL_cruise      = ;           % cruise lift coefficient           (-)
 
-        tank_eta0 = 0.0 % [2y/b]
-        tank_eta1 = 0.7 % [2y/b]
+% =========================================================================
+%   ENGINE — required by engine_cycle.m (do not rename these fields)
+% =========================================================================
+data.mdot_total     = 103.0;        % total inlet mass flow             (kg/s)
+data.inlet_pr       = 0.99;         % inlet pressure recovery           (-)
+data.fan_pr         = 1.6;          % fan pressure ratio                (-)
+data.eta_fan        = 0.92;         % fan isentropic efficiency         (-)
+data.comb_pr        = 0.96;         % combustor pressure ratio          (-)
+data.delta_T        = 900.0;        % combustor temperature rise T4-T3  (K)
 
-        f_tank = 0.93 % [-]
-        rho_fuel = 0.81715e3 % [Kg/m3]
+data.eta_c          = 0.87;         % compressor isentropic efficiency  (-)
+data.eta_t          = 0.90;         % turbine isentropic efficiency     (-)
+data.eta_mech       = 0.995;        % mechanical shaft efficiency       (-)
+data.eta_b          = 0.995;        % combustor efficiency              (-)
+data.nozzle_eff     = 0.98;         % nozzle efficiency                 (-)
 
-        CL_CD = NaN % [NAN-> compute with range]
-        
-        engine = struct("weight", 1600, ... % [Kg] Weight 
-                        "mounted_on", "wing", ... % option for engine placement ("wing", "fuselage")
-                        "eta", 0.25, ... % [y2/b] wing position (NaN for non-wing)
-                        "C_T", 1.8639e-4 ... % [-] thrust coefficient
-                        ) 
-        
-        M_cr = 0.77 % [-] 
-        h_cr = 9000 % [m]
-        V_MO = 263.89 % [m/s]
-        n_max = 2.5 % [-]
+data.R              = 287.0;        % specific gas constant — air       (J/kg/K)
+data.cp_air         = 1005.0;       % specific heat — cold section      (J/kg/K)
+data.kappa_air      = 1.40;         % ratio of specific heats — air     (-)
+data.cp_gas         = 1150.0;       % specific heat — hot section       (J/kg/K)
+data.kappa_gas      = 1.33;         % ratio of specific heats — gas     (-)
+data.LHV            = 43.0e6;       % fuel lower heating value          (J/kg)
 
-        MTOM = 47000 % [Kg]
-        W_fuel = 10000 % [Kg]
-        fuel_frac = 0.938 % [-]
-        R = 3200000 % [m]
-    end
+% =========================================================================
+%   STRUCTURES
+% =========================================================================
+% data.n_ult          = ;           % ultimate load factor              (-)
+% data.t_over_c       = ;           % wing thickness-to-chord ratio     (-)
+% data.material_rho   = ;           % structural material density       (kg/m^3)
+% data.sigma_allow    = ;           % allowable stress                  (Pa)
+
+% =========================================================================
+%   PERFORMANCE
+% =========================================================================
+data.W_fuel         = 120000;       % fixed fuel weight                 (N)  (~12.2 t)
+% data.range          = ;           % design range (use breguet_fuel.m) (m)
+data.V_cruise       = 230;          % cruise true airspeed              (m/s) (~Mach 0.78)
+% data.Mach_cruise    = ;           % cruise Mach number                (-)
+% data.SFC_target     = ;           % target SFC                        (g/kNs)
+
 end
