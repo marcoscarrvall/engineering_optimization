@@ -37,6 +37,7 @@ ac.MTOW       = 77000;        % [kg]   Max Take-Off Weight
 ac.OEW        = 42600;        % [kg]   Operating Empty Weight
 ac.fuel_mass  = 20100;        % [kg]   Max usable fuel
 ac.payload    = 14300;        % [kg]   Design payload (150 pax × ~95 kg)
+ac.W_wing_ref = 7700;         % [kg]   Reference wing weight (for scaling)
 
 ac.S_ref      = 122.4;        % [m2]   Wing reference area
 ac.b          = 34.1;         % [m]    Wing span
