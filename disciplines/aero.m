@@ -33,22 +33,6 @@ function state = aero(state, ac, atm, dv, eng)
     rho  = atm.rho_cr;
     q    = 0.5 * rho * V^2;          % dynamic pressure [Pa]
 
-<<<<<<< HEAD
-    % =========================================================
-    % 1.  UPDATED MTOW
-    %     Engine weight change (×2 engines) propagates into OEW → MTOW
-    % =========================================================
-    delta_W_eng  = ac.N_engines * (state.W_engine - eng.W_engine_ref);
-    MTOW_new     = ac.OEW + ac.payload + ac.fuel_mass + delta_W_eng;
-    state.MTOW   = MTOW_new;
-
-    % =========================================================
-    % 2.  LIFT COEFFICIENT  (steady level flight: L = W)
-    % =========================================================
-    CL = (MTOW_new * atm.g) / (q * ac.S_ref);
-    state.CL = CL;
-=======
->>>>>>> 54dd3377a3dc5d7e0910e4d3c96725a5b6f34fa6
 
     % =========================================================
     % 3.  PARASITIC DRAG INCREMENT  (nacelle wetted-area model)
