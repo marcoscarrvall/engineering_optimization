@@ -130,11 +130,11 @@ function state = wate(dv, ac, atm, eng, state, print_flag)
 
     MTOW_new     = ac.OEW + ac.payload + ac.fuel_mass + delta_W_eng;
 
-    S_new = MTOW_new / (0.5 * CL * rho * dv.V^2);
+    S_new = MTOW_new / (0.5 * ac.CL_cr * atm.rho_cr * dv.V^2);
 
-    W_wing = ac.W_wing_ref * (S_new / ac.S_ref)^0.9; 
+    W_wing = ac.W_wing* (S_new / ac.S_ref)^0.9; 
 
-    MTOW_new = MTOW_new + W_wing - ac.W_wing_ref;
+    MTOW_new = MTOW_new + W_wing - ac.W_wing;
     % =========================================================
     % 7.  WRITE OUTPUTS
     % =========================================================
