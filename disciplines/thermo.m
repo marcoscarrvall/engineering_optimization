@@ -1,4 +1,4 @@
-function state = thermo(state, dv, atm, thermo_data, verbose)
+function state = thermo(state, dv, atm, thermo_data, print_flag)
 %% THERMO.m  —  Thermodynamic cycle analysis (design-point turbofan)
 %
 % DROP-IN REPLACEMENT for the original fixed-FAR thermo.m.
@@ -48,7 +48,7 @@ gam = atm.gamma;
 R   = atm.R;
 
 N_eng = 2;
-if nargin < 5; verbose = true; end
+if nargin < 5; print_flag = false; end
 
 %% ---- 1.  Flight conditions ---------------------------------------------
 a_cr     = sqrt(gam * R * T0);
@@ -174,7 +174,7 @@ state.TSFC = TSFC_val;
 state.mdot = mdot_one * N_eng;   % update coupling variable for WATE
 
 %% ---- 7.  Console output ------------------------------------------------
-if verbose
+if print_flag
     fprintf('\n--- THERMO ---\n');
     fprintf('  TIT  (T04)      = %7.1f K\n',    T04);
     fprintf('  TSFC            = %.4e kg/N/s\n',    TSFC_val);

@@ -28,7 +28,11 @@
 %       using the engine dimensions output above.
 % =========================================================================
 
-function state = WATE(dv, ac, atm, eng, state)
+function state = wate(dv, ac, atm, eng, state, print_flag)
+
+    if nargin < 6
+        print_flag = false;
+    end
 
     BPR    = dv.BPR;
     PR_Fan = dv.PR_Fan;
@@ -38,6 +42,8 @@ function state = WATE(dv, ac, atm, eng, state)
 
     % per-engine mass flow [kg/s]  (state.mdot is total for both engines)
     mdot = state.mdot / 2;
+    CL = ac.CL_cr;  % use cruise CL for sizing (conservative for drag growth)
+    rho = atm.rho_cr;
 
     % =========================================================
     % 1.  FAN FACE SIZING  (continuity, hub-to-tip ratio = 0.30)
@@ -143,14 +149,7 @@ function state = WATE(dv, ac, atm, eng, state)
     state.W_wing    = W_wing;
     state.S         = S_new;
 
-<<<<<<< HEAD
-    fprintf('\n--- WATE ---\n');
-    fprintf('  mdot (per eng)  = %7.2f kg/s\n', mdot);
-    fprintf('  D_fan           = %7.4f m\n',     D_fan);
-    fprintf('  L_engine        = %7.4f m\n',     L_eng);
-    fprintf('  W_engine_dry    = %7.1f kg\n',    W_engine_dry);
-=======
-    if true
+    if print_flag
         fprintf('\n--- WATE ---\n');
         fprintf('  mdot (per eng)  = %7.2f kg/s\n', mdot);
         fprintf('  mdot_core       = %7.2f kg/s\n', mdot_core);
@@ -171,6 +170,4 @@ function state = WATE(dv, ac, atm, eng, state)
         fprintf('  W_wing          = %7.1f kg\n',    W_wing);
     end
     
->>>>>>> 54dd3377a3dc5d7e0910e4d3c96725a5b6f34fa6
-
 end

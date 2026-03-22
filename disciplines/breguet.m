@@ -22,8 +22,11 @@
 %
 % =========================================================================
 
-function state = breguet(state, dv, ac, atm, mis)
+function state = breguet(state, dv, ac, atm, mis, print_flag)
 
+    if nargin < 6
+        print_flag = false;
+    end
     V      = dv.V;
     LD     = state.CL_CD;
     TSFC   = state.TSFC;
@@ -61,7 +64,9 @@ function state = breguet(state, dv, ac, atm, mis)
     state.range  = range;
     state.W_fuel = W_start - W_end;
 
-    fprintf('\n--- BREGUET ---\n');
-    fprintf('  RANGE       = %.1f km  (%.1f nm)\n', range/1e3, range/1852);
+    if print_flag
+        fprintf('\n--- BREGUET ---\n');
+        fprintf('  RANGE       = %.1f km  (%.1f nm)\n', range/1e3, range/1852);
+    end
 
 end
