@@ -28,7 +28,7 @@
 %       using the engine dimensions output above.
 % =========================================================================
 
-function state = wate(dv, atm, eng, state)
+function state = WATE(dv, ac, atm, eng, state)
 
     BPR    = dv.BPR;
     PR_Fan = dv.PR_Fan;
@@ -120,20 +120,57 @@ function state = wate(dv, atm, eng, state)
     % =========================================================
     W_engine = W_engine_dry + W_pylon;
 
+    delta_W_eng  = ac.N_engines * (W_engine - eng.W_engine_ref);
+
+    MTOW_new     = ac.OEW + ac.payload + ac.fuel_mass + delta_W_eng;
+
+    S_new = MTOW_new / (0.5 * CL * rho * dv.V^2);
+
+    W_wing = ac.W_wing_ref * (S_new / ac.S_ref)^0.9; 
+
+    MTOW_new = MTOW_new + W_wing - ac.W_wing_ref;
     % =========================================================
     % 7.  WRITE OUTPUTS
     % =========================================================
+    
+    state.MTOW      = MTOW_new;
     state.W_engine  = W_engine;
     state.D_fan     = D_fan;
     state.D_nacelle = D_nacelle;
     state.L_engine  = L_eng;
     state.A_fan     = A_fan;
     state.N_stages  = N_stages;
+    state.W_wing    = W_wing;
+    state.S         = S_new;
 
+<<<<<<< HEAD
     fprintf('\n--- WATE ---\n');
     fprintf('  mdot (per eng)  = %7.2f kg/s\n', mdot);
     fprintf('  D_fan           = %7.4f m\n',     D_fan);
     fprintf('  L_engine        = %7.4f m\n',     L_eng);
     fprintf('  W_engine_dry    = %7.1f kg\n',    W_engine_dry);
+=======
+    if true
+        fprintf('\n--- WATE ---\n');
+        fprintf('  mdot (per eng)  = %7.2f kg/s\n', mdot);
+        fprintf('  mdot_core       = %7.2f kg/s\n', mdot_core);
+        fprintf('  OPR             = %7.2f\n',       OPR);
+        fprintf('  N_stages        = %7d\n',         N_stages);
+        fprintf('  D_fan           = %7.4f m\n',     D_fan);
+        fprintf('  D_nacelle       = %7.4f m\n',     D_nacelle);
+        fprintf('  L_engine        = %7.4f m\n',     L_eng);
+        fprintf('  A_fan           = %7.4f m2\n',    A_fan);
+        fprintf('  W_fan           = %7.1f kg\n',    W_fan);
+        fprintf('  W_compressor    = %7.1f kg\n',    W_compressor);
+        fprintf('  W_turbine       = %7.1f kg\n',    W_turbine);
+        fprintf('  W_nacelle_skin  = %7.1f kg\n',    W_nacelle);
+        fprintf('  W_engine_dry    = %7.1f kg\n',    W_engine_dry);
+        fprintf('  W_pylon         = %7.1f kg\n',    W_pylon);
+        fprintf('  W_engine_total  = %7.1f kg\n',    W_engine);
+        fprintf('  MTOW_new        = %7.1f kg\n',    MTOW_new);
+        fprintf('  W_wing          = %7.1f kg\n',    W_wing);
+    end
+    
+>>>>>>> 54dd3377a3dc5d7e0910e4d3c96725a5b6f34fa6
 
 end

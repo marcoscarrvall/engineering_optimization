@@ -33,6 +33,7 @@ function state = aero(state, ac, atm, dv, eng)
     rho  = atm.rho_cr;
     q    = 0.5 * rho * V^2;          % dynamic pressure [Pa]
 
+<<<<<<< HEAD
     % =========================================================
     % 1.  UPDATED MTOW
     %     Engine weight change (×2 engines) propagates into OEW → MTOW
@@ -46,6 +47,8 @@ function state = aero(state, ac, atm, dv, eng)
     % =========================================================
     CL = (MTOW_new * atm.g) / (q * ac.S_ref);
     state.CL = CL;
+=======
+>>>>>>> 54dd3377a3dc5d7e0910e4d3c96725a5b6f34fa6
 
     % =========================================================
     % 3.  PARASITIC DRAG INCREMENT  (nacelle wetted-area model)
@@ -58,34 +61,43 @@ function state = aero(state, ac, atm, dv, eng)
     S_wet_ratio   = (state.D_fan * state.L_engine) / (D_ref * L_ref);
 
     % Zero-lift drag increment from changed nacelle size
-    delta_CD0     = 0.0020 * (S_wet_ratio - 1);
+    CD0 = ac.CD0_clean * S_wet_ratio;
 
     % Interference drag — scales strongly with fan diameter growth
     delta_CD_int  = 0.0005 * (state.D_fan / D_ref)^2.5;
 
-    delta_CD_parasitic = delta_CD0 + delta_CD_int;
-
-    % =========================================================
-    % 4.  INDUCED DRAG INCREMENT  (from MTOW change)
-    % =========================================================
-    % Change in CL relative to baseline
-    CL_ref     = ac.CL_cr;
-    delta_CL   = CL - CL_ref;
+    delta_CD_parasitic = CD0 + delta_CD_int;
 
     % Total induced drag (using current CL, Oswald)
-    CD_induced = CL^2 / (pi * ac.AR * ac.e);
+    CD_induced = ac.CL_cr^2 / (pi * ac.AR * ac.e);
 
     % =========================================================
     % 5.  TOTAL DRAG COEFFICIENT & DRAG FORCE
     % =========================================================
-    CD_total   = ac.CD0_clean + delta_CD_parasitic + CD_induced;
-    D_total    = CD_total * q * ac.S_ref;        % [N] both engines share this
+    CD_total   = delta_CD_parasitic + CD_induced;
+    D_total    = CD_total * q * state.S;        % [N] both engines share this
 
     state.D_total = D_total;
+<<<<<<< HEAD
     state.CL_CD   = CL / CD_total;
 
     fprintf('\n--- AERO ---\n');
     fprintf('  L/D             = %8.4f\n', state.CL_CD);
     fprintf('  Drag (total)    = %8.1f N\n', D_total);
+=======
+    state.CL_CD   = ac.CL_cr / CD_total;
+    if true
+        fprintf('\n--- AERO ---\n');
+        fprintf('  MTOW            = %8.1f kg  (Δ %+.1f kg)\n', MTOW_new, delta_W_eng);
+        fprintf('  CL              = %8.5f\n', ac.CL_cr);
+        fprintf('  S_wet_ratio     = %8.4f\n', S_wet_ratio);
+        fprintf('  delta_CD0       = %8.6f\n', delta_CD0);
+        fprintf('  delta_CD_int    = %8.6f\n', delta_CD_int);
+        fprintf('  CD_induced      = %8.6f\n', CD_induced);
+        fprintf('  CD_total        = %8.6f\n', CD_total);
+        fprintf('  L/D             = %8.4f\n', state.CL_CD);
+        fprintf('  Drag (total)    = %8.1f N\n', D_total);
+    end
+>>>>>>> 54dd3377a3dc5d7e0910e4d3c96725a5b6f34fa6
 
 end
