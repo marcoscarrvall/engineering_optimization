@@ -176,18 +176,7 @@ state.mdot = mdot_one * N_eng;   % update coupling variable for WATE
 %% ---- 7.  Console output ------------------------------------------------
 if verbose
     fprintf('\n--- THERMO ---\n');
-    fprintf('  M_flight        = %.4f\n',       M_flight);
-    fprintf('  T02 fan inlet   = %7.1f K\n',    T02);
-    fprintf('  T021 fan exit   = %7.1f K\n',    T021);
-    fprintf('  T025 LPC exit   = %7.1f K\n',    T025);
-    fprintf('  T03  HPC exit   = %7.1f K\n',    T03);
     fprintf('  TIT  (T04)      = %7.1f K\n',    T04);
-    fprintf('  T045 HPT exit   = %7.1f K\n',    T045);
-    fprintf('  T05  LPT exit   = %7.1f K\n',    T05);
-    fprintf('  V6   core nozzle= %7.1f m/s\n',  V6);
-    fprintf('  V18  bypass noz = %7.1f m/s\n',  V18);
-    fprintf('  FAR (iterated)  = %.5f\n',        FAR_sol);
-    fprintf('  Fsp             = %7.2f N/(kg/s)\n', Fsp);
     fprintf('  TSFC            = %.4e kg/N/s\n',    TSFC_val);
     fprintf('  mdot (total)    = %7.2f kg/s\n',     state.mdot);
 end

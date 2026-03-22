@@ -33,6 +33,22 @@ function state = aero(state, ac, atm, dv, eng)
     rho  = atm.rho_cr;
     q    = 0.5 * rho * V^2;          % dynamic pressure [Pa]
 
+<<<<<<< HEAD
+    % =========================================================
+    % 1.  UPDATED MTOW
+    %     Engine weight change (×2 engines) propagates into OEW → MTOW
+    % =========================================================
+    delta_W_eng  = ac.N_engines * (state.W_engine - eng.W_engine_ref);
+    MTOW_new     = ac.OEW + ac.payload + ac.fuel_mass + delta_W_eng;
+    state.MTOW   = MTOW_new;
+
+    % =========================================================
+    % 2.  LIFT COEFFICIENT  (steady level flight: L = W)
+    % =========================================================
+    CL = (MTOW_new * atm.g) / (q * ac.S_ref);
+    state.CL = CL;
+=======
+>>>>>>> 54dd3377a3dc5d7e0910e4d3c96725a5b6f34fa6
 
     % =========================================================
     % 3.  PARASITIC DRAG INCREMENT  (nacelle wetted-area model)
@@ -62,6 +78,13 @@ function state = aero(state, ac, atm, dv, eng)
     D_total    = CD_total * q * state.S;        % [N] both engines share this
 
     state.D_total = D_total;
+<<<<<<< HEAD
+    state.CL_CD   = CL / CD_total;
+
+    fprintf('\n--- AERO ---\n');
+    fprintf('  L/D             = %8.4f\n', state.CL_CD);
+    fprintf('  Drag (total)    = %8.1f N\n', D_total);
+=======
     state.CL_CD   = ac.CL_cr / CD_total;
     if true
         fprintf('\n--- AERO ---\n');
@@ -74,5 +97,6 @@ function state = aero(state, ac, atm, dv, eng)
         fprintf('  L/D             = %8.4f\n', state.CL_CD);
         fprintf('  Drag (total)    = %8.1f N\n', D_total);
     end
+>>>>>>> 54dd3377a3dc5d7e0910e4d3c96725a5b6f34fa6
 
 end
