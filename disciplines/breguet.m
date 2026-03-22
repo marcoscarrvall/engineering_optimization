@@ -39,19 +39,15 @@ function state = breguet(state, dv, ac, atm, mis, print_flag)
     ff_to     = 0.970;        % take-off fuel fraction
     ff_climb  = 0.985;        % climb to cruise altitude
     ff_descent= 0.990;        % descent + approach
-    ff_reserve= 1 - mis.reserve_f;   % reserve fuel kept on-board
 
     % Weight at start of cruise
     W_start = MTOW * ff_to * ff_climb;
 
     % ---- 2.  BREGUET RANGE  (iterative: solve for W_end → range) ---------
     % Available cruise fuel
-    W_fuel_available = ac.fuel_mass * ff_reserve - ...
-                       MTOW * (1 - ff_to * ff_climb);
-    W_fuel_available = max(W_fuel_available, 1);   % non-negative
 
-    W_end   = W_start - W_fuel_available;
-    W_end   = max(W_end, 0.5 * W_start);           % physical sanity bound
+
+    W_end   = W_start - ac.fuel_mass;
 
     % Breguet range [m]
     range   = (V / (g * TSFC)) * LD * log(W_start / W_end);
