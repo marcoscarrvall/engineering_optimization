@@ -39,7 +39,6 @@ function state = aero(state, ac, atm, dv, eng)
     % =========================================================
     delta_W_eng  = ac.N_engines * (state.W_engine - eng.W_engine_ref);
     MTOW_new     = ac.OEW + ac.payload + ac.fuel_mass + delta_W_eng;
-    MTOW_new     = max(MTOW_new, 0.80 * ac.MTOW);   % physical lower bound
     state.MTOW   = MTOW_new;
 
     % =========================================================
@@ -86,14 +85,6 @@ function state = aero(state, ac, atm, dv, eng)
     state.CL_CD   = CL / CD_total;
 
     fprintf('\n--- AERO ---\n');
-    fprintf('  MTOW            = %8.1f kg  (Δ %+.1f kg)\n', MTOW_new, delta_W_eng);
-    fprintf('  CL              = %8.5f\n', CL);
-    fprintf('  delta_CL        = %8.5f\n', delta_CL);
-    fprintf('  S_wet_ratio     = %8.4f\n', S_wet_ratio);
-    fprintf('  delta_CD0       = %8.6f\n', delta_CD0);
-    fprintf('  delta_CD_int    = %8.6f\n', delta_CD_int);
-    fprintf('  CD_induced      = %8.6f\n', CD_induced);
-    fprintf('  CD_total        = %8.6f\n', CD_total);
     fprintf('  L/D             = %8.4f\n', state.CL_CD);
     fprintf('  Drag (total)    = %8.1f N\n', D_total);
 
