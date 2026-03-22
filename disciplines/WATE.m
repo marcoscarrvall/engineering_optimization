@@ -132,19 +132,8 @@ function state = wate(dv, atm, eng, state)
 
     fprintf('\n--- WATE ---\n');
     fprintf('  mdot (per eng)  = %7.2f kg/s\n', mdot);
-    fprintf('  mdot_core       = %7.2f kg/s\n', mdot_core);
-    fprintf('  OPR             = %7.2f\n',       OPR);
-    fprintf('  N_stages        = %7d\n',         N_stages);
     fprintf('  D_fan           = %7.4f m\n',     D_fan);
-    fprintf('  D_nacelle       = %7.4f m\n',     D_nacelle);
     fprintf('  L_engine        = %7.4f m\n',     L_eng);
-    fprintf('  A_fan           = %7.4f m2\n',    A_fan);
-    fprintf('  W_fan           = %7.1f kg\n',    W_fan);
-    fprintf('  W_compressor    = %7.1f kg\n',    W_compressor);
-    fprintf('  W_turbine       = %7.1f kg\n',    W_turbine);
-    fprintf('  W_nacelle_skin  = %7.1f kg\n',    W_nacelle);
     fprintf('  W_engine_dry    = %7.1f kg\n',    W_engine_dry);
-    fprintf('  W_pylon         = %7.1f kg\n',    W_pylon);
-    fprintf('  W_engine_total  = %7.1f kg\n',    W_engine);
 
 end

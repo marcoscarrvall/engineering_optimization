@@ -62,13 +62,6 @@ function state = breguet(state, dv, ac, atm, mis)
     state.W_fuel = W_start - W_end;
 
     fprintf('\n--- BREGUET ---\n');
-    fprintf('  V           = %.1f m/s\n', V);
-    fprintf('  L/D         = %.4f\n',    LD);
-    fprintf('  TSFC        = %.4e kg/N/s\n', TSFC);
-    fprintf('  MTOW        = %.1f kg\n', MTOW);
-    fprintf('  W_start_cr  = %.1f kg\n', W_start);
-    fprintf('  W_end_cr    = %.1f kg\n', W_end);
-    fprintf('  Fuel used   = %.1f kg\n', state.W_fuel);
     fprintf('  RANGE       = %.1f km  (%.1f nm)\n', range/1e3, range/1852);
 
 end
