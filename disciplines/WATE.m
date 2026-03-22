@@ -143,13 +143,6 @@ function state = WATE(dv, ac, atm, eng, state)
     state.W_wing    = W_wing;
     state.S         = S_new;
 
-<<<<<<< HEAD
-    fprintf('\n--- WATE ---\n');
-    fprintf('  mdot (per eng)  = %7.2f kg/s\n', mdot);
-    fprintf('  D_fan           = %7.4f m\n',     D_fan);
-    fprintf('  L_engine        = %7.4f m\n',     L_eng);
-    fprintf('  W_engine_dry    = %7.1f kg\n',    W_engine_dry);
-=======
     if true
         fprintf('\n--- WATE ---\n');
         fprintf('  mdot (per eng)  = %7.2f kg/s\n', mdot);
@@ -171,6 +164,5 @@ function state = WATE(dv, ac, atm, eng, state)
         fprintf('  W_wing          = %7.1f kg\n',    W_wing);
     end
     
->>>>>>> 54dd3377a3dc5d7e0910e4d3c96725a5b6f34fa6
 
 end

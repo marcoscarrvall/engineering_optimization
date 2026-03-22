@@ -78,13 +78,6 @@ function state = aero(state, ac, atm, dv, eng)
     D_total    = CD_total * q * state.S;        % [N] both engines share this
 
     state.D_total = D_total;
-<<<<<<< HEAD
-    state.CL_CD   = CL / CD_total;
-
-    fprintf('\n--- AERO ---\n');
-    fprintf('  L/D             = %8.4f\n', state.CL_CD);
-    fprintf('  Drag (total)    = %8.1f N\n', D_total);
-=======
     state.CL_CD   = ac.CL_cr / CD_total;
     if true
         fprintf('\n--- AERO ---\n');
@@ -97,6 +90,5 @@ function state = aero(state, ac, atm, dv, eng)
         fprintf('  L/D             = %8.4f\n', state.CL_CD);
         fprintf('  Drag (total)    = %8.1f N\n', D_total);
     end
->>>>>>> 54dd3377a3dc5d7e0910e4d3c96725a5b6f34fa6
 
 end
