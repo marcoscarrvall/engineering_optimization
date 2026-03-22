@@ -76,7 +76,7 @@ function state = mda(dv, ac, atm, eng, thermo_data, wate_data, options)
     state.N_stages  = 0;
     state.MTOW      = ac.MTOW_ref;
 
-    state.W_wing_ref = ac.W_wing_ref;
+    state.W_wing    = ac.W_wing;
 
     % Derived convergence variable
     OEW_i = ac.N_engines * state.W_engine;

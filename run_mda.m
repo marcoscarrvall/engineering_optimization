@@ -35,7 +35,7 @@ ac.OEW          = 42600;   % baseline OEW          [kg]   (without engines)
 ac.payload      = 16600;   % design payload        [kg]
 ac.fuel_mass    = 18800;   % block fuel            [kg]
 ac.MTOW_ref     = 78000;   % reference MTOW        [kg]
-ac.W_wing_ref   = 7700;    % reference wing weight [kg]
+ac.W_wing   = 7700;    % reference wing weight [kg]
 
 %% ── ENGINE REFERENCE DATA  (CFM56-5B) ───────────────────────────────────
 eng.W_engine_ref  = 2800;  % reference engine+pylon weight [kg]  per engine
