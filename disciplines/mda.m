@@ -76,6 +76,8 @@ function state = mda(dv, ac, atm, eng, thermo_data, wate_data, options)
     state.N_stages  = 0;
     state.MTOW      = ac.MTOW_ref;
 
+    state.W_wing_ref = ac.W_wing_ref;
+
     % Derived convergence variable
     OEW_i = ac.N_engines * state.W_engine;
 
@@ -108,14 +110,14 @@ function state = mda(dv, ac, atm, eng, thermo_data, wate_data, options)
         iter = iter + 1;
 
         % ── (a) WATE: engine geometry + weight from current mdot ──────────
-        state = wate(dv, atm, eng, state, false);
+        state = wate(dv, ac, atm, eng, state);
 
         % ── (b) AERO: drag + L/D from updated engine weight & nacelle size ─
-        state = aero(state, ac, atm, dv, eng, false);
+        state = aero(state, ac, atm, dv, eng);
 
         % ── (c) THERMO: find mdot so that F_net = D_total/2 ───────────────
         %   state.mdot is updated → feeds back into WATE on next iteration
-        state = thermo(state, dv, atm, thermo_data, false);
+        state = thermo(state, dv, atm, thermo_data);
 
         % ── Convergence check on mdot ─────────────────────────────────────
         mdot_j = state.mdot;
@@ -159,7 +161,7 @@ function state = mda(dv, ac, atm, eng, thermo_data, wate_data, options)
     end
 
     %% ── 4.  FINAL VERBOSE DISCIPLINE PASS ───────────────────────────────
-    state = wate(dv, atm, eng, state, true);
+    state = wate(dv, ac, atm, eng, state, true);
     state = aero(state, ac, atm, dv, eng, true);
     state = thermo(state, dv, atm, thermo_data, true);
 
