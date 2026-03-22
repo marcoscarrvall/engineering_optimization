@@ -65,10 +65,9 @@ function state = aero(state, ac, atm, dv, eng)
     state.CL_CD   = ac.CL_cr / CD_total;
     if true
         fprintf('\n--- AERO ---\n');
-        fprintf('  MTOW            = %8.1f kg  (Δ %+.1f kg)\n', MTOW_new, delta_W_eng);
         fprintf('  CL              = %8.5f\n', ac.CL_cr);
         fprintf('  S_wet_ratio     = %8.4f\n', S_wet_ratio);
-        fprintf('  delta_CD0       = %8.6f\n', delta_CD0);
+        fprintf('  delta_CD0       = %8.6f\n', CD0);
         fprintf('  delta_CD_int    = %8.6f\n', delta_CD_int);
         fprintf('  CD_induced      = %8.6f\n', CD_induced);
         fprintf('  CD_total        = %8.6f\n', CD_total);
