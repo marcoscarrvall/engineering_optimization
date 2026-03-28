@@ -59,7 +59,7 @@ F_noise = zeros(1, length(V_noise_range));
 
 for i = 1:length(V_noise_range)
     % Use the index 'i' to fill the preallocated spots
-    F_noise(i) = optim([V_noise_range(i), x0(2)], TestAC_data);
+    F_noise(i) = optim([V_noise_range(i), x0(2)], x_consts, TestAC_data, options_mda);
 end
 
 figure('Name', 'Numerical Noise Check');
@@ -75,7 +75,7 @@ df_dx = zeros(1, length(h_sizes)); % Preallocate
 
 for i = 1:length(h_sizes)
     h = h_sizes(i);
-    df = (optim([x0(1)+h, x0(2)], TestAC_data) - optim(x0, TestAC_data)) / h;
+    df = (optim([x0(1)+h, x0(2)], x_consts, TestAC_data, options_mda) - optim(x0, x_consts, TestAC_data, options_mda)) / h;
     df_dx(i) = df;
 end
 
@@ -90,8 +90,8 @@ starts = { [235, 5], [215, 4.5], [255, 5.5], [220, 6] };
 results = zeros(length(starts), 2);
 
 for i = 1:length(starts)
-    [x_opt, f_opt] = fmincon(@(x) optim(x, TestAC_data), starts{i}, ...
-                             [], [], [], [], lb, ub, @(x) constraints(x, TestAC_data), options);
+    [x_opt, f_opt] = fmincon(@(x) optim(x, x_consts, TestAC_data, options_mda), starts{i}, ...
+                             [], [], [], [], lb, ub, @(x) constraints(x, x_consts, TestAC_data, options_mda), options);
     results(i, :) = x_opt;
 end
 

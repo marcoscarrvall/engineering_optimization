@@ -1,15 +1,16 @@
-function [c_noise] = noise(state, x, x_consts, atm, thermo)
+function [c_noise] = noise(state, x, x_consts, atm, thermo, eng)
 
     Cp_c  = thermo.Cp_air;
     gam_c = thermo.gamma_c;
     eta_f = thermo.eta_fan;
 
     % ---- Fan inlet total conditions (same as THERMO station 2) ----------
-    M0   = x(1) / atm.a_cr;
-    T02  = atm.T_cr * (1 + (gam_c - 1)/2 * M0^2);
+    a_cr = sqrt(atm.gamma * atm.R * atm.T_cruise);
+    M0   = x(1) / a_cr;
+    T02  = atm.T_cruise * (1 + (gam_c - 1)/2 * M0^2);
 
     % ---- Fan temperature rise from pressure ratio (polytropic) ----------
-    T021_is = T02 * x_consts.PR_Fan^((gam_c - 1) / gam_c);
+    T021_is = T02 * x_consts.PR_fan^((gam_c - 1) / gam_c);
     T021    = T02 + (T021_is - T02) / eta_f;
     delta_h = Cp_c * (T021 - T02);              % [J/kg] fan specific work
 
