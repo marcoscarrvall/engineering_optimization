@@ -1,5 +1,4 @@
 function [c_TIT] = tit(state, eng)
-
     TIT     = state.TIT;
     TIT_max = eng.TIT_max;
 
