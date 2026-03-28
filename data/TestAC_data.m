@@ -47,7 +47,7 @@ classdef TestAC_data
             "OPR_ref",          27.0,      ... % [-]    CFM56-5B overall pressure ratio
             "rho_mat",          4430,      ... % [kg/m^3]  titanium alloy
             "TIT_max",          1800.0,    ... % [K]    max allowable TIT
-            "M_tip_max",        1.05,      ... % [-]    max fan tip relative Mach number
+            "M_tip_max",        1.8,      ... % [-]    max fan tip relative Mach number
             "h_engine",         2.10,      ... % [m]    engine centreline height above ground
             "clearance_min",    0.30,      ... % [m]    minimum fan tip-to-ground clearance
             "tip_gap_frac",     0.005      ... % [-]    tip-to-nacelle gap fraction

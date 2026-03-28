@@ -17,8 +17,8 @@ x_consts.PR_LPC = 2.6;
 x_consts.PR_HPC = 6.1;
 
 % Define range for plotting (10% around x0 as per your code)
-V_range = linspace(lb(1), ub(1), 30);
-BPR_range = linspace(lb(2), ub(2), 30);
+V_range = linspace(0, 400, 30);
+BPR_range = linspace(0, 16, 30);
 [VV, BB] = meshgrid(V_range, BPR_range);
 
 F_plot = zeros(size(VV));

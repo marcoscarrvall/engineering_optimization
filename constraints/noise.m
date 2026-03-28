@@ -29,7 +29,6 @@ function [c_noise] = noise(state, x, x_consts, atm, thermo, eng)
     M_tip  = V_rel / a_in;
 
     state.M_tip = M_tip;
-
     % Normalised inequality: g(x) = (M_tip - M_tip_max) / M_tip_max <= 0
     c_noise  = (M_tip - eng.M_tip_max) / eng.M_tip_max;
     violated = c_noise > 0;
