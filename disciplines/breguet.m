@@ -12,7 +12,7 @@ function state = breguet(state, x, atm, ac, mission, print_flag)
     % ---- 1.  FUEL FRACTIONS  ---------------------------------------------
     % Allow for take-off, climb and descent fuel burn fractions
     % (simple mission fractions, Raymer-style)
-    ff_to = mission.ff_to;           % take-off fuel fraction
+    ff_to = mission.ff_takeoff;           % take-off fuel fraction
     ff_climb = mission.ff_climb;     % climb fuel fraction
     ff_descent = mission.ff_descent; % descent fuel fraction
 
