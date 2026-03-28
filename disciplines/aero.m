@@ -45,10 +45,10 @@ function state = aero(state, ac, atm, dv, eng, print_flag)
     L_ref = eng.L_engine_ref;
 
     % Wetted-area ratio of current nacelle vs. reference
-    S_wet_ratio   = (state.D_fan * state.L_engine) / (D_ref * L_ref);
+    S_wet_ratio   = (state.D_fan * state.L_engine-D_ref * L_ref) / (D_ref * L_ref+ac.S_ref);
 
     % Zero-lift drag increment from changed nacelle size
-    CD0 = ac.CD0_clean * S_wet_ratio;
+    CD0 = ac.CD0_clean *(1 + S_wet_ratio);
 
     % Interference drag — scales strongly with fan diameter growth
     delta_CD_int  = 0.0005 * (state.D_fan / D_ref)^2.5;
