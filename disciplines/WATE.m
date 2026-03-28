@@ -42,8 +42,6 @@ function state = wate(dv, ac, atm, eng, state, print_flag)
 
     % per-engine mass flow [kg/s]  (state.mdot is total for both engines)
     mdot = state.mdot / 2;
-    CL = ac.CL_cr;  % use cruise CL for sizing (conservative for drag growth)
-    rho = atm.rho_cr;
 
     % =========================================================
     % 1.  FAN FACE SIZING  (continuity, hub-to-tip ratio = 0.30)
