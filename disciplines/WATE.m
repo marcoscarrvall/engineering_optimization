@@ -69,7 +69,15 @@ function state = wate(dv, ac, atm, eng, state, print_flag)
     % =========================================================
     % 2.  STAGE COUNT  (each stage ~ PR 1.25)
     % =========================================================
-    N_stages = ceil(log(OPR) / log(1.25));   % total incl. fan
+    psi_fan = 1.5;  % Fans are usually 1 stage, high loading
+    psi_lpc = 1.25; % Low Pressure Compressor
+    psi_hpc = 1.35; % High Pressure Compressor (often higher loading)
+
+    % Calculate continuous number of stages
+    n_fan = log(PR_fan) / log(psi_fan);
+    n_lpc = log(PR_lpc) / log(psi_lpc);
+    n_hpc = log(PR_hpc) / log(psi_hpc);
+    N_stages = ceil(n_fan + n_lpc + n_hpc);  % round up to nearest whole stage
     N_comp   = N_stages - 1;                 % LPC + HPC stages
 
     % =========================================================
