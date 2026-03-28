@@ -122,9 +122,7 @@ classdef TestAC_data
             "TSFC",         NaN,   ... % [kg/N/s]  thrust-specific fuel consumption
             "range",        NaN,   ... % [m]    achievable range (Breguet)
             "clearance",    NaN    ... % [m]    fan tip-to-ground clearance
-            ... % --- Coupling ---
-            "mdot",         NaN    ... % [kg/s]  total mass flow (written by thermo, read by wate)
-        )
+             )
 
     end
 end
