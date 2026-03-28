@@ -1,33 +1,9 @@
-%% BREGUET.m
-% Breguet Range Equation
-%
-% Computes the aircraft cruise range using the Breguet range equation:
-%
-%       R = (V / (g * TSFC)) * (L/D) * ln(W_start / W_end)
-%
-% where:
-%   W_start = MTOW  (start of cruise, after climb fuel allowance)
-%   W_end   = MTOW - fuel_cruise  (end of cruise)
-%
-% INPUTS:
-%   state.CL_CD   [-]       Lift-to-drag ratio
-%   state.TSFC    [kg/N/s]  Thrust specific fuel consumption
-%   state.MTOW    [kg]      Maximum take-off weight
-%   dv.V          [m/s]     Cruise true airspeed
-%   ac, atm, mis            Reference data
-%
-% OUTPUTS (written into state struct):
-%   state.range   [m]       Computed cruise range
-%   state.W_fuel  [kg]      Cruise fuel used
-%
-% =========================================================================
-
-function state = breguet(state, dv, ac, atm, mis, print_flag)
+function state = breguet(state, x, atm, ac, mission, print_flag)
 
     if nargin < 6
         print_flag = false;
     end
-    V      = dv.V;
+    V      = x(1);
     LD     = state.CL_CD;
     TSFC   = state.TSFC;
     MTOW   = state.MTOW;
@@ -36,27 +12,19 @@ function state = breguet(state, dv, ac, atm, mis, print_flag)
     % ---- 1.  FUEL FRACTIONS  ---------------------------------------------
     % Allow for take-off, climb and descent fuel burn fractions
     % (simple mission fractions, Raymer-style)
-    ff_to     = 0.970;        % take-off fuel fraction
-    ff_climb  = 0.985;        % climb to cruise altitude
-    ff_descent= 0.990;        % descent + approach
+    ff_to = mission.ff_to;           % take-off fuel fraction
+    ff_climb = mission.ff_climb;     % climb fuel fraction
+    ff_descent = mission.ff_descent; % descent fuel fraction
 
     % Weight at start of cruise
     W_start = MTOW * ff_to * ff_climb;
 
-    % ---- 2.  BREGUET RANGE  (iterative: solve for W_end → range) ---------
-    % Available cruise fuel
-
-
     W_end   = W_start - ac.fuel_mass;
 
-    % Breguet range [m]
     range   = (V / (g * TSFC)) * LD * log(W_start / W_end);
 
-    % ---- 3.  ACCOUNT FOR DESCENT FUEL  -----------------------------------
-    % Approximate final descent phase (not in Breguet) — penalise ~1%
     range   = range * ff_descent;
 
-    % ---- 4.  WRITE OUTPUTS  ----------------------------------------------
     state.range  = range;
 
     if print_flag
