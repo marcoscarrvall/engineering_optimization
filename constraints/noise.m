@@ -38,7 +38,7 @@
 %
 % =========================================================================
 
-function [c_noise, violated, margin, state] = noise(state, dv, atm, thermo, con)
+function [c_noise] = noise(state, dv, atm, thermo, con)
 
     Cp_c  = thermo.Cp_air;
     gam_c = thermo.gamma_c;
@@ -74,18 +74,12 @@ function [c_noise, violated, margin, state] = noise(state, dv, atm, thermo, con)
     violated = c_noise > 0;
     margin   = -c_noise;       % [-]  positive = safe headroom
 
-    fprintf('\n--- Noise (M_tip) Constraint ---\n');
-    fprintf('  U_tip         = %.2f m/s\n',  U_tip);
-    fprintf('  V_ax          = %.2f m/s\n',  V_ax);
-    fprintf('  V_rel (tip)   = %.2f m/s\n',  V_rel);
-    fprintf('  M_tip         = %.4f\n',       M_tip);
-    fprintf('  M_tip_max     = %.4f\n',       con.M_tip_max);
-    fprintf('  c_noise       = %+.6f [-]  (normalised)\n', c_noise);
-    fprintf('  Margin        = %+.6f [-]\n', margin);
+
     if violated
         fprintf('  STATUS        : *** VIOLATED (fan too fast / too loud) ***\n');
     else
         fprintf('  STATUS        : Satisfied\n');
+        fprintf('  Margin        : %+.6f [-]\n', margin);
     end
 
 end

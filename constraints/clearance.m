@@ -34,7 +34,7 @@
 %
 % =========================================================================
 
-function [c_cl, violated, margin] = clearance(state, eng, con)
+function [c_cl] = clearance(state, eng, con)
 
     R_nacelle = state.D_nacelle / 2;
 
@@ -49,16 +49,11 @@ function [c_cl, violated, margin] = clearance(state, eng, con)
     violated = c_cl > 0;
     margin   = -c_cl;          % [-]  positive = safe headroom
 
-    fprintf('\n--- Clearance Constraint ---\n');
-    fprintf('  R_nacelle     = %.4f m\n',  R_nacelle);
-    fprintf('  Clearance     = %.4f m\n',  clearance_val);
-    fprintf('  Min clearance = %.4f m\n',  con.clearance_min);
-    fprintf('  c_cl          = %+.6f [-]  (normalised)\n', c_cl);
-    fprintf('  Margin        = %+.6f [-]  (= %.4f m)\n', margin, margin * con.clearance_min);
     if violated
         fprintf('  STATUS        : *** VIOLATED (nacelle too large / mounted too low) ***\n');
     else
         fprintf('  STATUS        : Satisfied\n');
+        fprintf('  Margin        : %+.6f [-]\n', margin);
     end
 
 end

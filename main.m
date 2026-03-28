@@ -1,7 +1,9 @@
-x0 = [1.0, 1.0, 1.0, 1.0]; 
+x0 = [235, 5 ]; % [V, BPR]
 
-lb = [0.1, 0.1, 0.1, 0.1];
-ub = [10.0, 10.0, 10.0, 10.0];
+coefficient = 0.1;
+
+lb = [x0(1) * (1 - coefficient), x0(2) * (1 - coefficient)];
+ub = [x0(1) * (1 + coefficient), x0(2) * (1 + coefficient)];
 
 options = optimoptions('fmincon', ...
     'Algorithm', 'sqp', ...        
@@ -10,7 +12,7 @@ options = optimoptions('fmincon', ...
     'StepTolerance', 1e-6);
 
 
-[x_opt, f_opt, exitflag] = fmincon(@objective_mdf, x0, [], [], [], [], lb, ub, @constraints, options);
+[x_opt, f_opt, exitflag] = fmincon(@optim, x0, [], [], [], [], lb, ub, @(x) constraints(x, TestAC_data), options);
 
 fprintf('\n--- Optimization Results ---\n');
 fprintf('Optimal Design Vector: [%s]\n', num2str(x_opt));

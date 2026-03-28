@@ -1,12 +1,10 @@
-function [g, h] = constraints(x)
-    % Perform MDA again (or use a global variable/cache to save time)
-    y = solve_mda(x);
+function [g, h] = constraints(x, TestAC_data)
     
-    % 3 Constraint Functions (g(x) <= 0 format)
+    state_converged = run_mda(x);
     g = zeros(3, 1);
-    g(1) = y(1) - 50;   % Example: Limit on a discipline output
-    g(2) = x(2) + y(2); % Example: Structural constraint
-    g(3) = 1 - y(4);    % Example: Minimum performance requirement
+    g(1) = clearance(state_converged, TestAC_data.eng, TestAC_data.con);
+    g(2) = noise(state_converged, TestAC_data.dv, TestAC_data.atm, TestAC_data.thermo, TestAC_data.con);
+    g(3) = tit(state_converged, TestAC_data.con);
     
-    h = []; % No equality constraints required for MDF structure
+    h = []; 
 end
