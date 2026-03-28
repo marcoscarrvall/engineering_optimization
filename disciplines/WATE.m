@@ -4,7 +4,7 @@ function state = wate(state, x, x_consts, atm, eng, wate_consts, ac, print_flag)
         print_flag = false;
     end
 
-    BPR    = x.BPR;
+    BPR    = x(2);
     PR_fan = x_consts.PR_fan;
     PR_LPC = x_consts.PR_LPC;
     PR_HPC = x_consts.PR_HPC;
@@ -16,7 +16,7 @@ function state = wate(state, x, x_consts, atm, eng, wate_consts, ac, print_flag)
     hub_tip_ratio = wate_consts.hub_to_tip;  % typical turbofan value
 
     % Cruise inlet total conditions (isentropic intake)
-    M0   = x.V / sqrt(atm.gamma * atm.R * atm.T_cruise);
+    M0   = x(1) / sqrt(atm.gamma * atm.R * atm.T_cruise);
     T02  = atm.T_cruise * (1 + (atm.gamma - 1)/2 * M0^2);
     P02  = atm.P_cruise * (T02 / atm.T_cruise)^(atm.gamma / (atm.gamma - 1));
 
@@ -81,7 +81,7 @@ function state = wate(state, x, x_consts, atm, eng, wate_consts, ac, print_flag)
     MTOW_new     = ac.OEW + ac.W_pay + ac.W_fuel + delta_W_eng;
 
 
-    S_new = (MTOW_new-ac.W_fuel/2)*9.81 / (0.5 * ac.CL_cruise * atm.rho_cruise * x.V^2);
+    S_new = (MTOW_new-ac.W_fuel/2)*9.81 / (0.5 * ac.CL_cruise * atm.rho_cruise * x(1)^2);
 
 
     W_wing = ac.W_wing* (S_new / ac.S_ref)^0.9; 

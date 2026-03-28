@@ -12,7 +12,7 @@ ac          = data.ac;
 
 % Override S_ref to be consistent with cruise lift balance at mid-cruise weight
 ac.S_ref = (ac.MTOW - ac.W_fuel/2) * atm.g / ...
-           (0.5 * ac.CL_cruise * atm.rho_cruise * x.V^2);
+           (0.5 * ac.CL_cruise * atm.rho_cruise * x(1)^2);
 
 %% ---- 2. Initialisation -------------------------------------------------
 state           = data.state;
