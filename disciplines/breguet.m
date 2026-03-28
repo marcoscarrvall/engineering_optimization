@@ -58,7 +58,6 @@ function state = breguet(state, dv, ac, atm, mis, print_flag)
 
     % ---- 4.  WRITE OUTPUTS  ----------------------------------------------
     state.range  = range;
-    state.W_fuel = W_start - W_end;
 
     if print_flag
         fprintf('\n--- BREGUET ---\n');
