@@ -12,8 +12,9 @@ options = optimoptions('fmincon', ...
     'StepTolerance', 1e-6);
 
 
-[x_opt, f_opt, exitflag] = fmincon(@optim, x0, [], [], [], [], lb, ub, @(x) constraints(x, TestAC_data), options);
+[x_opt, f_opt, exitflag] = fmincon(@(x) optim(x, TestAC_data), x0, [], [], [], [], lb, ub, @(x) constraints(x, TestAC_data), options);
 
 fprintf('\n--- Optimization Results ---\n');
 fprintf('Optimal Design Vector: [%s]\n', num2str(x_opt));
 fprintf('Optimal Objective Value: %f\n', f_opt);
+

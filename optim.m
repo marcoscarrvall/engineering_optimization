@@ -1,6 +1,7 @@
-function f = optim(x)
+function range = optim(x, TestAC_data)
     state_converged = run_mda(x);
     
+    state_converged = breguet(state_converged, TestAC_data.dv, TestAC_data.ac, TestAC_data.atm, TestAC_data.mis, TestAC_data.print_flag);
 
-    f = x(1)^2 + y(3); 
+    range = state_converged.R;
 end
