@@ -7,6 +7,15 @@ coefficient = 0.1;
 
 lb = [x0(1) * (1 - coefficient), x0(2) * (1 - coefficient)];
 ub = [x0(1) * (1 + coefficient), x0(2) * (1 + coefficient)];
+
+options_mda.tol = 1e-6;
+options_mda.max_iter = 100;
+options_mda.verbose = false;
+
+x_consts.PR_fan = 1.7;
+x_consts.PR_LPC = 2.6;
+x_consts.PR_HPC = 6.1;
+
 % Define range for plotting (10% around x0 as per your code)
 V_range = linspace(lb(1), ub(1), 30);
 BPR_range = linspace(lb(2), ub(2), 30);
@@ -20,8 +29,8 @@ G3_plot = zeros(size(VV));
 % Populate data for plots
 for i = 1:numel(VV)
     xi = [VV(i), BB(i)];
-    F_plot(i) = optim(xi, TestAC_data);
-    [gi, ~] = constraints(xi, TestAC_data);
+    F_plot(i) = optim(xi, x_consts, TestAC_data, options_mda);
+    [gi, ~] = constraints(xi, x_consts, TestAC_data, options_mda);
     G1_plot(i) = gi(1);
     G2_plot(i) = gi(2);
     G3_plot(i) = gi(3);

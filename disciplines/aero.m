@@ -4,7 +4,7 @@ function state = aero(state, x, atm, eng, ac, print_flag)
         print_flag = false;
     end
 
-    V    = x.V;
+    V    = x(1);
     rho  = atm.rho_cruise;
     q    = 0.5 * rho * V^2;          % dynamic pressure [Pa]
 

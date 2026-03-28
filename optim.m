@@ -1,7 +1,8 @@
-function range = optim(x, TestAC_data)
-    state_converged = mda(x);
-    
-    state_converged = breguet(state_converged, TestAC_data.dv, TestAC_data.ac, TestAC_data.atm, TestAC_data.mis, TestAC_data.print_flag);
+function range = optim(x, x_consts, TestAC_data, options_mda)
 
-    range = state_converged.R;
+    state_converged = mda(x, x_consts, TestAC_data, options_mda);
+    
+    state_converged = breguet(state_converged, x, TestAC_data.atm, TestAC_data.ac, TestAC_data.mission);
+
+    range = state_converged.range;
 end

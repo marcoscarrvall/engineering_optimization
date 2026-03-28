@@ -1,7 +1,7 @@
 function state = thermo(state, x, x_consts, atm, thermo_data, ac, print_flag)
 
-BPR      = x.BPR;
-V_inf    = x.V;
+BPR      = x(2);
+V_inf    = x(1);
 
 PR_fan   = x_consts.PR_fan;
 PR_LPC   = x_consts.PR_LPC;
