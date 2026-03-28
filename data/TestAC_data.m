@@ -15,28 +15,28 @@ classdef TestAC_data
             "g",            9.81       ... % [m/s^2]   gravitational acceleration
         )
 
-        thermo_data = struct( ...
+        thermo = struct( ...
             ... % --- Gas properties ---
             "Cp_air",       1005.0,    ... % [J/kg/K]  specific heat, cold stream (air)
             "Cp_gas",       1150.0,    ... % [J/kg/K]  specific heat, hot stream (combustion gas)
             "gamma_c",      1.4,       ... % [-]       cp/cv, cold stream
             "gamma_h",      1.33,      ... % [-]       cp/cv, hot stream
             "LHV",          43e6,      ... % [J/kg]    fuel lower heating value
-            "FAR",          0.0279536484, ...% [-]     fuel-to-air ratio (pre-computed, delta_T = 900 K)
+            "FAR",          0.023927, ...% [-]     fuel-to-air ratio (pre-computed, delta_T = 900 K)
             ... % --- Combustor ---
             "eta_cc",       0.995,     ... % [-]  combustor efficiency          (= eta_b)
             "dP_cc_frac",   0.04,      ... % [-]  combustor total-pressure loss (= 1 - comb_pr)
             "inlet_pr",     0.99,      ... % [-]  inlet total-pressure recovery
             ... % --- Component isentropic efficiencies ---
-            "eta_fan",      0.87,      ... % [-]  fan
-            "eta_LPC",      0.87,      ... % [-]  low-pressure compressor
-            "eta_HPC",      0.87,      ... % [-]  high-pressure compressor
-            "eta_HPT",      0.90,      ... % [-]  high-pressure turbine
-            "eta_LPT",      0.90,      ... % [-]  low-pressure turbine
+            "eta_fan",      0.92,      ... % [-]  fan
+            "eta_LPC",      0.92,      ... % [-]  low-pressure compressor
+            "eta_HPC",      0.92,      ... % [-]  high-pressure compressor
+            "eta_HPT",      0.91,      ... % [-]  high-pressure turbine
+            "eta_LPT",      0.91,      ... % [-]  low-pressure turbine
             "eta_mech",     0.995,     ... % [-]  mechanical (shaft)
-            "nozzle_eff",   0.98,      ... % [-]  nozzle isentropic efficiency
+            "nozzle_eff",   0.99,      ... % [-]  nozzle isentropic efficiency
             ... % --- Mach at LPC face (area sizing) ---
-            "M21",          0.5        ... % [-]  Mach number at station 21 (LPC face)
+            "M21",          0.8        ... % [-]  Mach number at station 21 (LPC face)
         )
 
         eng = struct( ...
