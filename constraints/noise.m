@@ -38,9 +38,6 @@ function [c_noise] = noise(state, x, x_consts, atm, thermo, eng)
 
     if violated
         fprintf('  STATUS        : *** VIOLATED (fan too fast / too loud) ***\n');
-    else
-        fprintf('  STATUS        : Satisfied\n');
-        fprintf('  Margin        : %+.6f [-]\n', margin);
     end
 
 end
