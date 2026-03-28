@@ -1,74 +1,34 @@
-%% AERO.m
-% Aerodynamics Module
-%
-% Computes the drag and lift changes that result from updated engine geometry
-% and weight, then re-evaluates the aircraft lift-to-drag ratio.
-%
-% The drag model follows the reference formulation:
-%   delta_CD0       — nacelle wetted-area increment relative to baseline
-%   delta_CD_int    — interference drag scaling with (D_fan/D_ref)^2.5
-%   delta_CD_induced— induced-drag change from the MTOW update
-%
-% INPUTS (via structs):
-%   state.W_engine  [kg]   Current engine + pylon weight (one engine)
-%   state.D_fan     [m]    Current fan tip diameter
-%   state.D_nacelle [m]    Current nacelle outer diameter
-%   state.L_engine  [m]    Current engine length
-%   state.MTOW      [kg]   Current MTOW (will be updated here)
-%   dv.V            [m/s]  Cruise true airspeed
-%   ac              struct  Aircraft reference data
-%   atm             struct  Atmospheric data
-%   eng             struct  Engine reference data
-%
-% OUTPUTS (updated in state struct):
-%   state.MTOW      [kg]   Updated MTOW
-%   state.D_total   [N]    Total aircraft drag at cruise (both engines)
-%   state.CL_CD     [-]    Updated cruise lift-to-drag ratio
-%   state.CL        [-]    Current lift coefficient
-% =========================================================================
-
-function state = aero(state, ac, atm, dv, eng, print_flag)
+function state = aero(state, x, atm, eng, ac, print_flag)
 
     if nargin < 6
         print_flag = false;
     end
 
-    V    = dv.V;
-    rho  = atm.rho_cr;
+    V    = x.V;
+    rho  = atm.rho_cruise;
     q    = 0.5 * rho * V^2;          % dynamic pressure [Pa]
 
-    % =========================================================
-    % 3.  PARASITIC DRAG INCREMENT  (nacelle wetted-area model)
-    % =========================================================
-    % Reference nacelle dimensions (CFM56-5B on A320)
     D_ref = eng.D_fan_ref;
-    L_ref = eng.L_engine_ref;
+    L_ref = eng.L_eng_ref;
+    CD_total = ac.CD_cruise;         % baseline total drag coefficient (from data)
 
     % Wetted-area ratio of current nacelle vs. reference
-    S_wet_ratio   = (state.D_fan * state.L_engine-D_ref * L_ref) / (D_ref * L_ref+ac.S_ref);
+    S_wet_ratio   = 2*(state.D_fan * state.L_eng-D_ref * L_ref) / (ac.S_ref);
 
     % Zero-lift drag increment from changed nacelle size
-    CD0 = ac.CD0_clean *(1 + S_wet_ratio);
+    delta_CD_parasitic = ac.CD_parasitic_ref *S_wet_ratio;
 
     % Interference drag — scales strongly with fan diameter growth
     delta_CD_int  = 0.0005 * (state.D_fan / D_ref)^2.5;
 
-    delta_CD_parasitic = CD0 + delta_CD_int;
+    delta_CD0 = delta_CD_parasitic + delta_CD_int;
+    D_total  = (CD_total + delta_CD0) * q * state.S;                % total from scratch
 
-    % Total induced drag (using current CL, Oswald)
-    CD_induced = ac.CL_cr^2 / (pi * ac.AR * ac.e);
+    state.D_cruise = D_total;
+    state.CL_CD   = ac.CL_cruise / (CD_total+delta_CD0);
 
-    % =========================================================
-    % 5.  TOTAL DRAG COEFFICIENT & DRAG FORCE
-    % =========================================================
-    CD_total   = delta_CD_parasitic + CD_induced;
-    D_total    = CD_total * q * state.S;        % [N] both engines share this
-
-    state.D_total = D_total;
-    state.CL_CD   = ac.CL_cr / CD_total;
     if print_flag
         fprintf('\n--- AERO ---\n');
-        fprintf('  CL              = %8.5f\n', ac.CL_cr);
         fprintf('  L/D             = %8.4f\n', state.CL_CD);
         fprintf('  Drag (total)    = %8.1f N\n', D_total);
     end

@@ -97,7 +97,7 @@ end
 F_net_sp_core = (1+FAR)*V6 + BPR*V18 - (1+BPR)*V_inf;   % [N/(kg_core/s)]
 
 %% ---- 5.  Required mass flow --------------------------------------------
-F_req    = state.D_total / N_eng;          % thrust per engine [N]
+F_req    = state.D_cruise / N_eng;          % thrust per engine [N]
 
 %% ---- 6.  Derived quantities --------------------------------------------
 mdot_c = F_req / max(F_net_sp_core, 1e-6);   % [kg/s] core, per engine
