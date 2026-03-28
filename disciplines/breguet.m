@@ -19,7 +19,7 @@ function state = breguet(state, x, atm, ac, mission, print_flag)
     % Weight at start of cruise
     W_start = MTOW * ff_to * ff_climb;
 
-    W_end   = W_start - ac.fuel_mass;
+    W_end   = W_start - ac.W_fuel;
 
     range   = (V / (g * TSFC)) * LD * log(W_start / W_end);
 
