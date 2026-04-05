@@ -54,7 +54,7 @@ classdef TestAC_data
         )
 
         wate = struct( ...
-            "hub_to_tip",       0.30,      ... % [-]    fan hub-to-tip radius ratio
+            "hub_to_tip",       0.25,      ... % [-]    fan hub-to-tip radius ratio
             "M_axial",          0.55,      ... % [-]    axial Mach number at fan face
             "p_stage",          0.20,      ... % [m]    axial length per compressor stage
             "L_combustor",      0.35,      ... % [m]    combustor axial length

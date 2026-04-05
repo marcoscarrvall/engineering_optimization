@@ -3,7 +3,7 @@ fprintf('Running Initial Problem Investigation...\n');
 
 x0 = [235, 5 ]; % [V, BPR]
 
-coefficient = 0.1;
+coefficient = 4;
 
 lb = [x0(1) * (1 - coefficient), x0(2) * (1 - coefficient)];
 ub = [x0(1) * (1 + coefficient), x0(2) * (1 + coefficient)];

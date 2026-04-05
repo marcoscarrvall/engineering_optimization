@@ -11,7 +11,7 @@ function state = wate(state, x, x_consts, atm, eng, wate_consts, ac, print_flag)
     OPR    = PR_fan * PR_LPC * PR_HPC;
 
     % per-engine mass flow [kg/s]  (state.mdot is total for both engines)
-    mdot = state.mdot / 2;
+    mdot = state.mdot / 2*0.7;
 
     hub_tip_ratio = wate_consts.hub_to_tip;  % typical turbofan value
 

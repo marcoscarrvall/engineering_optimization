@@ -1,10 +1,19 @@
-% --- 1. DEFINE YOUR LABELS HERE ---
-% Match these to the order they appear in your constraints.m file
+clear; clc; close all;
+
 constraint_names = {'clearance', 'noise', 'TIT'};
 
 % Initial guess and bounds
 x0 = [235, 5]; 
-coefficient = 0.1;
+x_consts.PR_fan = 1.7;
+x_consts.PR_LPC = 2.6;
+x_consts.PR_HPC = 6.1;
+
+
+options_mda.tol = 1e-6;
+options_mda.max_iter = 100;
+options_mda.verbose = false;
+
+coefficient = 4;
 lb = x0 * (1 - coefficient);
 ub = x0 * (1 + coefficient);
 
