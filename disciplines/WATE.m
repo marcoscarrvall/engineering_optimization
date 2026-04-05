@@ -1,14 +1,13 @@
-function state = wate(state, x, x_consts, atm, eng, wate_consts, ac, print_flag)
+function state = wate(state, x, atm, eng, wate_consts, ac, print_flag)
 
     if nargin < 8
         print_flag = false;
     end
 
     BPR    = x(2);
-    PR_fan = x_consts.PR_fan;
-    PR_LPC = x_consts.PR_LPC;
-    PR_HPC = x_consts.PR_HPC;
-    OPR    = PR_fan * PR_LPC * PR_HPC;
+    PR_fan = x(3);
+    PR_LPC = x(4);
+    PR_HPC = x(5);
 
     % per-engine mass flow [kg/s]  (state.mdot is total for both engines)
     mdot = state.mdot / 2*0.7;
@@ -87,6 +86,8 @@ function state = wate(state, x, x_consts, atm, eng, wate_consts, ac, print_flag)
     W_wing = ac.W_wing* (S_new / ac.S_ref)^0.9; 
 
     MTOW_new = MTOW_new + W_wing - ac.W_wing;
+
+    M_tip = 0.5 * sqrt((1+BPR)*(PR_fan-1));
     % =========================================================
     % 7.  WRITE OUTPUTS
     % =========================================================
@@ -100,6 +101,8 @@ function state = wate(state, x, x_consts, atm, eng, wate_consts, ac, print_flag)
     state.N_stages  = N_stages;
     state.W_wing    = W_wing;
     state.S         = S_new;
+    state.M_tip     = M_tip;
+    state.eta_fan     = eng.eta_fan-0.8*(max(0, M_tip-1.1))^1.5; % simple model: fan efficiency drops if BPR > 10
 
     if print_flag
         fprintf('\n--- WATE ---\n');

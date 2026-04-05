@@ -1,4 +1,4 @@
-function state = mda(x, x_consts, data, options)
+function state = mda(x, data, options)
 tol = options.tol;
 max_iter = options.max_iter;
 verbose = options.verbose;
@@ -25,7 +25,7 @@ state.S         = ac.S_ref;
 state.D_cruise  = ac.MTOW * atm.g / 17.5;
 
 % Initial mdot from thermo at that thrust
-state = thermo(state, x, x_consts, atm, thermo_data, ac);
+state = thermo(state, x, atm, thermo_data, ac);
 
 %% ---- 3. MDA loop -------------------------------------------------------
 if verbose
@@ -39,9 +39,9 @@ converged = false;
 for iter = 1:max_iter
     MTOW_prev = state.MTOW;
 
-    state = wate  (state, x, x_consts, atm, eng, wate_consts, ac);
+    state = wate  (state, x, atm, eng, wate_consts, ac);
     state = aero  (state, x, atm, eng, ac);
-    state = thermo(state, x, x_consts, atm, thermo_data, ac);
+    state = thermo(state, x, atm, thermo_data, ac);
 
     rel_change = abs(state.MTOW - MTOW_prev) / MTOW_prev;
 
