@@ -8,7 +8,7 @@ function state = breguet(state, x, atm, ac, mission, print_flag)
     TSFC   = state.TSFC;
     MTOW   = state.MTOW;
     g      = atm.g;
-    fprintf('\n  Breguet: V=%.1f m/s, L/D=%.2f, TSFC=%.4f, MTOW=%.0f => ', V, LD, TSFC*10000, MTOW);
+    %fprintf('\n  Breguet: V=%.1f m/s, L/D=%.2f, TSFC=%.4f, MTOW=%.0f => ', V, LD, TSFC*10000, MTOW);
 
     % ---- 1.  FUEL FRACTIONS  ---------------------------------------------
     % Allow for take-off, climb and descent fuel burn fractions
