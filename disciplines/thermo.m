@@ -1,11 +1,11 @@
-function state = thermo(state, x, x_consts, atm, thermo_data, ac, print_flag)
+function state = thermo(state, x, atm, thermo_data, ac, print_flag)
 
 BPR      = x(2);
 V_inf    = x(1);
+PR_fan   = x(3);
+PR_LPC   = x(4);
+PR_HPC   = x(5);
 
-PR_fan   = x_consts.PR_fan;
-PR_LPC   = x_consts.PR_LPC;
-PR_HPC   = x_consts.PR_HPC;
 
 Cp_c     = thermo_data.Cp_air;
 Cp_h     = thermo_data.Cp_gas;
@@ -14,7 +14,7 @@ gam_h    = thermo_data.gamma_h;
 LHV      = thermo_data.LHV;
 eta_cc   = thermo_data.eta_cc;
 dP_cc    = thermo_data.dP_cc_frac;
-eta_fan  = thermo_data.eta_fan;
+eta_fan  = state.eta_fan;
 eta_LPC  = thermo_data.eta_LPC;
 eta_HPC  = thermo_data.eta_HPC;
 eta_HPT  = thermo_data.eta_HPT;
@@ -102,7 +102,7 @@ F_req    = state.D_cruise / N_eng;          % thrust per engine [N]
 %% ---- 6.  Derived quantities --------------------------------------------
 mdot_c = F_req / max(F_net_sp_core, 1e-6);   % [kg/s] core, per engine
 mdot_one = mdot_c * (1 + BPR);               % [kg/s] total, per engine
-TSFC_val = (mdot_c * FAR) / max(F_req, 1e-9);
+TSFC_val = (ac.V_ref*mdot_c* FAR)/(max(F_req, 1e-9)*2.3*V_inf);
 
 %% ---- 7.  Update state --------------------------------------------------
 state.TIT  = T04;

@@ -26,7 +26,6 @@ classdef TestAC_data
             "dP_cc_frac",   0.04,      ... % [-]  combustor total-pressure loss
             "inlet_pr",     0.995,     ... % [-]  inlet total-pressure recovery
             ... % --- Component isentropic efficiencies (CFM56-5B level) ---
-            "eta_fan",      0.92,      ... % [-]  fan
             "eta_LPC",      0.91,      ... % [-]  low-pressure compressor (3 stages)
             "eta_HPC",      0.90,      ... % [-]  high-pressure compressor (9 stages)
             "eta_HPT",      0.91,      ... % [-]  high-pressure turbine
@@ -46,11 +45,13 @@ classdef TestAC_data
             "thrust_max_ref",   120000,    ... % [N]    CFM56-5B max take-off thrust (27,000 lbf)
             "OPR_ref",          27.0,      ... % [-]    CFM56-5B overall pressure ratio
             "rho_mat",          4430,      ... % [kg/m^3]  titanium alloy
-            "TIT_max",          1800.0,    ... % [K]    max allowable TIT
-            "M_tip_max",        1.8,      ... % [-]    max fan tip relative Mach number
+            "TIT_max",          1900.0,    ... % [K]    max allowable TIT
+            "M_tip_max",        1.4,      ... % [-]    max fan tip relative Mach number
+            "eta_fan",          0.92,      ... % [-]    fan isentropic efficiency
             "h_engine",         2.10,      ... % [m]    engine centreline height above ground
             "clearance_min",    0.30,      ... % [m]    minimum fan tip-to-ground clearance
-            "tip_gap_frac",     0.005      ... % [-]    tip-to-nacelle gap fraction
+            "tip_gap_frac",     0.005,      ... % [-]    tip-to-nacelle gap fraction
+            "F_required",       150000         ... % [N]    required thrust
         )
 
         wate = struct( ...
@@ -64,6 +65,7 @@ classdef TestAC_data
         ac = struct( ...
             ... % --- Wing geometry (A320ceo) ---
             "S_ref",        135,     ... % [m^2]  wing reference area
+            "V_ref",        235,     ... % [m/s]  cruise velocity (M0.78 at 35,000 ft)
             "AR",           9.39,      ... % [-]    wing aspect ratio
             "e",            0.85,      ... % [-]    Oswald span efficiency
             "sweep",        25.0,      ... % [deg]  wing quarter-chord sweep
@@ -111,6 +113,8 @@ classdef TestAC_data
             "L_eng",        NaN,   ... % [m]    overall engine length
             "A_fan",        NaN,   ... % [m^2]  fan annulus area
             ... % --- Compressor stages ---
+            "eta_fan",      0.92,   ... % [-]    fan isentropic efficiency
+            "M_tip",        NaN,   ... % [-]    fan tip Mach number
             "N_stages",     NaN,   ... % [-]    total compressor stage count
             ... % --- Cruise aerodynamics ---
             "D_cruise",     NaN,   ... % [N]    cruise drag
