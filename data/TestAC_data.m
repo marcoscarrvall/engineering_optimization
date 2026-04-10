@@ -2,13 +2,12 @@ classdef TestAC_data
 
     properties (Constant)
 
-        name = "A320"
+        name = "TestAC"
 
         atm = struct( ...
             "rho_cruise",   0.3639,    ... % [kg/m^3]  ISA density at 35,000 ft
             "T_cruise",     218.8,     ... % [K]       ISA static temperature at 35,000 ft
             "P_cruise",     23842.0,   ... % [Pa]      ISA static pressure at 35,000 ft
-            "gamma",        1.4,       ... % [-]       cp/cv, air
             "R",            287.0,     ... % [J/kg/K]  specific gas constant, air
             "g",            9.81       ... % [m/s^2]   gravitational acceleration
         )
@@ -46,20 +45,12 @@ classdef TestAC_data
             "OPR_ref",          27.0,      ... % [-]    CFM56-5B overall pressure ratio
             "rho_mat",          4430,      ... % [kg/m^3]  titanium alloy
             "TIT_max",          1900.0,    ... % [K]    max allowable TIT
-            "M_tip_max",        1.4,      ... % [-]    max fan tip relative Mach number
+            "M_tip_max",        1.6,      ... % [-]    max fan tip relative Mach number
             "eta_fan",          0.92,      ... % [-]    fan isentropic efficiency
             "h_engine",         2.10,      ... % [m]    engine centreline height above ground
             "clearance_min",    0.30,      ... % [m]    minimum fan tip-to-ground clearance
             "tip_gap_frac",     0.005,      ... % [-]    tip-to-nacelle gap fraction
             "F_required",       150000         ... % [N]    required thrust
-        )
-
-        wate = struct( ...
-            "hub_to_tip",       0.25,      ... % [-]    fan hub-to-tip radius ratio
-            "M_axial",          0.55,      ... % [-]    axial Mach number at fan face
-            "p_stage",          0.20,      ... % [m]    axial length per compressor stage
-            "L_combustor",      0.35,      ... % [m]    combustor axial length
-            "W_misc",           150        ... % [kg]   miscellaneous systems mass
         )
 
         ac = struct( ...
@@ -94,14 +85,12 @@ classdef TestAC_data
             ... % --- Reserve ---
             "fuel_reserve", 0.05,      ... % [-]  5 % reserve fuel
             ... % --- Design mission ---
-            "R_range",      3300e3,    ... % [m]   A320 design range (3 300 km / 1 780 NM)
-            ... % --- Endurance ---
-            "t_max",        8.0*3600   ... % [s]   max flight time (~8 h for A320)
+            "range_0",      NaN    ... % [m]   A320 design range
         )
 
         state = struct( ...
             ... % --- Mass flows ---
-            "m_dot_total",  NaN,   ... % [kg/s]  total engine mass-flow (fan face)
+            "mdot_total",  NaN,   ... % [kg/s]  total engine mass-flow (fan face)
             ... % --- Weights (sized) ---
             "MTOW",         NaN,   ... % [kg]   max take-off weight (converged)
             "W_eng",        NaN,   ... % [kg]   installed engine weight, per engine

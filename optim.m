@@ -1,7 +1,7 @@
-function range = optim(x, TestAC_data, options_mda)
-
-    state_converged = mda(x, TestAC_data, options_mda);
-    
-    state_converged = breguet(state_converged, x, TestAC_data.atm, TestAC_data.ac, TestAC_data.mission);
-    range = 1-(state_converged.range/10153468.473336);
+function objective = optim(x, data, mda_options)
+    state_converged = mda(x, data, mda_options);
+    fprintf("\nConverged range: %.2f km", state_converged.range/1000);
+    fprintf("\nOriginal range: %.2f km", data.ac.range/1000);
+    objective = (data.ac.range-state_converged.range) / data.ac.range;
+    fprintf("\nObjective value: %.4f\n", objective);
 end 

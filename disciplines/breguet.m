@@ -1,36 +1,21 @@
-function state = breguet(state, x, atm, ac, mission, print_flag)
+function state = breguet(state, x, ac, print_flag)
 
-    if nargin < 6
+    if nargin < 4
         print_flag = false;
     end
+
     V      = x(1);
-    LD     = state.CL_CD;
-    TSFC   = state.TSFC;
-    MTOW   = state.MTOW;
-    g      = atm.g;
-    %fprintf('\n  Breguet: V=%.1f m/s, L/D=%.2f, TSFC=%.4f, MTOW=%.0f => ', V, LD, TSFC*10000, MTOW);
 
-    % ---- 1.  FUEL FRACTIONS  ---------------------------------------------
-    % Allow for take-off, climb and descent fuel burn fractions
-    % (simple mission fractions, Raymer-style)
-    ff_to = mission.ff_takeoff;           % take-off fuel fraction
-    ff_climb = mission.ff_climb;     % climb fuel fraction
-    ff_descent = mission.ff_descent; % descent fuel fraction
-
-    % Weight at start of cruise
-    W_start = MTOW * ff_to * ff_climb;
-
-    W_end   = W_start - ac.W_fuel;
-
-    range   = (V / (g * TSFC)) * LD * log(W_start / W_end);
-
-    range   = range * ff_descent;
+    range   = (V / (9.81 * state.TSFC)) * state.CL_CD * log(state.MTOW / (state.MTOW - ac.W_fuel));
 
     state.range  = range;
 
+    state.objective = -(range-ac.range)/ac.range;
+
     if print_flag
-        fprintf('\n--- BREGUET ---\n');
-        fprintf('  RANGE       = %.1f km  (%.1f nm)\n', range/1e3, range/1852);
+        fprintf('\n--- BREGUET ---');
+        fprintf('\n  RANGE       = %.1f km', range/1e3);
+        fprintf('\n  Objective    = %5.3f\n', state.objective);
     end
 
 end

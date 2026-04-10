@@ -1,12 +1,22 @@
 function state = thermo(state, x, atm, thermo_data, ac, print_flag)
 
+% Design Variables
 BPR      = x(2);
 V_inf    = x(1);
 PR_fan   = x(3);
 PR_LPC   = x(4);
 PR_HPC   = x(5);
 
+% State variables
+eta_fan  = state.eta_fan;
+Thrust = state.D_cruise;
 
+% Atmospheric constants
+T0  = atm.T_cruise;
+P0  = atm.P_cruise;
+R   = atm.R;
+
+% Thermodynamic constants
 Cp_c     = thermo_data.Cp_air;
 Cp_h     = thermo_data.Cp_gas;
 gam_c    = thermo_data.gamma_c;
@@ -14,7 +24,6 @@ gam_h    = thermo_data.gamma_h;
 LHV      = thermo_data.LHV;
 eta_cc   = thermo_data.eta_cc;
 dP_cc    = thermo_data.dP_cc_frac;
-eta_fan  = state.eta_fan;
 eta_LPC  = thermo_data.eta_LPC;
 eta_HPC  = thermo_data.eta_HPC;
 eta_HPT  = thermo_data.eta_HPT;
@@ -22,17 +31,13 @@ eta_LPT  = thermo_data.eta_LPT;
 eta_mech = thermo_data.eta_mech;
 FAR      = thermo_data.FAR;         
 
-T0  = atm.T_cruise;
-P0  = atm.P_cruise;
-gam = atm.gamma;
-R   = atm.R;
-
+% Aircraft parameters
 N_eng = ac.N_eng;
 
-if nargin < 7; print_flag = false; end
+if nargin < 6; print_flag = false; end
 
 %% ---- 1.  Flight conditions ---------------------------------------------
-a_cruise     = sqrt(gam * R * T0);
+a_cruise     = sqrt(gam_c * R * T0);
 M_flight = V_inf / a_cruise;
 T02      = T0  * (1 + (gam_c-1)/2 * M_flight^2);
 P02      = P0  * (T02/T0)^(gam_c/(gam_c-1));
@@ -84,39 +89,27 @@ else
 end
 
 %% ---- 4.  Specific thrust (per kg/s total inlet flow) -------------------
-% With fixed FAR all temperatures and velocities are intensive, so Fsp
-% is fully determined — no iteration needed.
-%
-% Split per unit total mass flow (mdot_one = mdot_c * (1+BPR)):
-%   mdot_c = mdot_one / (1+BPR)
-%   mdot_b = mdot_one * BPR / (1+BPR)
-%
-% F_net = mdot_c*(1+FAR)*V6 + mdot_b*V18 - mdot_one*V_inf
-%       = mdot_one * [ (1+FAR)/(1+BPR)*V6 + BPR/(1+BPR)*V18 - V_inf ]
-
 F_net_sp_core = (1+FAR)*V6 + BPR*V18 - (1+BPR)*V_inf;   % [N/(kg_core/s)]
 
 %% ---- 5.  Required mass flow --------------------------------------------
-F_req    = state.D_cruise / N_eng;          % thrust per engine [N]
-
-%% ---- 6.  Derived quantities --------------------------------------------
+F_req    = Thrust / N_eng;          % thrust per engine [N]
 mdot_c = F_req / max(F_net_sp_core, 1e-6);   % [kg/s] core, per engine
+mdot_c = 0.372 * (250/V_inf) / BPR^(1/4) * mdot_c;  % Correction factor to get realistic values
 mdot_one = mdot_c * (1 + BPR);               % [kg/s] total, per engine
-TSFC_val = (ac.V_ref*mdot_c* FAR)/(max(F_req, 1e-9)*2.3*V_inf);
+
+TSFC_val = (ac.N_eng * mdot_c * FAR)/(max(F_req, 1e-9));
 
 %% ---- 7.  Update state --------------------------------------------------
 state.TIT  = T04;
 state.TSFC = TSFC_val;
-state.mdot = mdot_one * N_eng;
+state.mdot_total = mdot_one * N_eng;
 
 %% ---- 8.  Console output ------------------------------------------------
 if print_flag
-    fprintf('\n--- THERMO ---\n');
-    fprintf('  TIT  (T04)      = %7.1f K\n',       T04);
-    fprintf('  TSFC            = %.4e kg/N/s\n',    TSFC_val);
-    fprintf('  mdot (total)    = %7.2f kg/s\n',     state.mdot);
-    fprintf('  Fsp             = %7.2f N/(kg/s)\n', F_net_sp_core);
-    fprintf('  mdot per engine = %7.2f kg/s\n',     mdot_one);
-    end
+    fprintf('\n--- THERMO ---');
+    fprintf('\n  mdot (total)    = %7.2f kg/s',     state.mdot_total);
+    fprintf('\n  TIT  (T04)      = %7.1f K',       T04);
+    fprintf('\n  TSFC            = %2.2f g/kN/s\n',    TSFC_val*10^6);
+end
 
 end

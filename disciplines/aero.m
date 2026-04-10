@@ -10,27 +10,34 @@ function state = aero(state, x, atm, eng, ac, print_flag)
 
     D_ref = eng.D_fan_ref;
     L_ref = eng.L_eng_ref;
-    CD_total = ac.CD_cruise;         % baseline total drag coefficient (from data)
+    CD_total_ref = ac.CD_cruise_ref;         % baseline total drag coefficient (from data)
 
-    % Wetted-area ratio of current nacelle vs. reference
-    S_wet_ratio   = 2*(state.D_fan * state.L_eng-D_ref * L_ref) / (ac.S_ref);
+    S_wet_ratio   = (state.D_fan * state.L_eng-D_ref * L_ref + ac.S_ref) / (ac.S_ref);
+    delta_CD_parasitic = ac.CD_parasitic_ref * (S_wet_ratio-1);
+    delta_CD_int  = 2 * (state.D_fan / D_ref - 1)^2.5;
+    delta_CD0 = (delta_CD_parasitic + delta_CD_int) * (V/ 230); % Scale profile drag with velocity 
+    if V > 250 
+        delta_CDwave = 0.0005 * (V-250)/10; 
+    else 
+        delta_CDwave = 0; 
+    end
+    delta_CD0 = delta_CD0 + delta_CDwave;
 
-    % Zero-lift drag increment from changed nacelle size
-    delta_CD_parasitic = ac.CD_parasitic_ref *S_wet_ratio;
+    CL = state.MTOW*9.81 / (q * ac.S_ref);
+    delta_CL2 = CL^2 - ac.CL_cruise_ref^2;
+    delta_CDi = delta_CL2/ (pi * ac.AR * ac.e);
 
-    % Interference drag — scales strongly with fan diameter growth
-    delta_CD_int  = 0.0005 * (state.D_fan / D_ref)^2.5;
+    delta_CD = delta_CD0 + delta_CDi;
+    CD = CD_total_ref + delta_CD;
 
-    delta_CD0 = delta_CD_parasitic + delta_CD_int;
-    D_total  = (CD_total + delta_CD0) * q * state.S;                % total from scratch
+    D_total  = CD * q * ac.S_ref;                
 
     state.D_cruise = D_total;
-    state.CL_CD   = ac.CL_cruise / (CD_total+delta_CD0);
+    state.CL_CD   = CL / CD;
 
     if print_flag
-        fprintf('\n--- AERO ---\n');
-        fprintf('  L/D             = %8.4f\n', state.CL_CD);
-        fprintf('  Drag (total)    = %8.1f N\n', D_total);
+        fprintf('\n--- AERO ---');
+        fprintf("\n Lift-to-drag ratio (CL/CD) = %5.1f\n", state.CL_CD);
     end
 
 end

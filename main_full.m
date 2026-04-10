@@ -10,8 +10,8 @@ options_mda.max_iter = 200;
 options_mda.verbose = false;
 
 coefficient = 1;
-lb = [50, 4, 1.1, 1.1, 10];
-ub = [260, 20, 1.8, 1.8, 25];
+lb = [235, 4, 1.1, 1.1, 10];
+ub = [235, 20, 1.8, 1.8, 25];
 
 % Global storage — all fields including x
 global optHistory current_c
@@ -22,13 +22,14 @@ optHistory.x      = [];
 
 options = optimoptions('fmincon', ...
     'Algorithm', 'sqp', ...            % SQP is good for physical constraints
-    'Display', 'iter-detailed', ...    % Gives more info on which constraint is the "killer"
+    'Display', 'none', ...    % Gives more info on which constraint is the "killer"
     'OptimalityTolerance', 1e-6, ...   % Relaxed
     'StepTolerance', 1e-6, ...         % Relaxed
     'ConstraintTolerance', 1e-4, ...   % Allows a tiny bit of "breathing room"
     'MaxFunctionEvaluations', 10000, ...
     'OutputFcn', @outfun);
 
+fprintf("\nStarting Optimizer")
 fprintf('\n%-10s %-12s %-12s %-12s\n', 'Iter', 'V (x1)', 'BPR (x2)', 'f(x)');
 fprintf('-----------------------------------------------------------\n');
 
@@ -60,6 +61,9 @@ if ~isempty(optHistory.constr)
         legend(h, 'Location', 'bestoutside');
     end
 end
+
+
+
 
 % --- DESIGN VARIABLE EVOLUTION ---
 var_names = {'V (m/s)', 'BPR', 'PR_{fan}', 'PR_{LPC}', 'PR_{HPC}'};
