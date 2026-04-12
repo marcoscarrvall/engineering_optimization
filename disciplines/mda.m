@@ -18,9 +18,6 @@ state = aero(state, x, data.atm, data.eng, data.ac, false);
 state.MTOW  = data.ac.OEW_ref + data.ac.W_pay + data.ac.W_fuel;  
 
 
-fprintf('%-6s  %-12s  %-12s  %-12s  %-10s \n', ...
-        'Iter', 'MTOW [kg]', 'rel_dMTOW', "V_cruise [m/s]", "BPR");
-
 for iter = 1:max_iter
     MTOW_prev = state.MTOW;
 
@@ -45,6 +42,7 @@ for iter = 1:max_iter
     if rel_change > 0.1
         fprintf("Warning: Divergence detected, range unchanged \n")
         state.objective = state.objective + 0.1*state.objective; 
+        state.range=0;
         break
     end
 
