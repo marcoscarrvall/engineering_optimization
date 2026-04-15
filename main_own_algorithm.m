@@ -1,4 +1,4 @@
-clear; clc; close all;
+clear all; clear global; clc; close all;
 
 % =========================================================================
 % PROBLEM SETUP
