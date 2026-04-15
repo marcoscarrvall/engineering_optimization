@@ -96,7 +96,7 @@ for i = 1:5
     title(['Boundedness: ', var_names{i}]);
     xlabel([var_names{i}, ' ', units{i}]);
     grid on;
-    
+    legend([p1, p2, p3], con_names, 'Location', 'northeast');
 end
 
 function x_norm = normalize_vars(x, lb, ub)

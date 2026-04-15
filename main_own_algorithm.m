@@ -226,7 +226,7 @@ starting_points = [
     240, 14.0, 1.7,  2.0,  25.0;   % Upper bounds
     210, 6.5,  1.2,  1.3,  12.0;   % Feasible low
     225, 11.0, 1.6,  1.5,  20.0;   % Feasible mid-high
-    218, 9.5,  1.35, 1.8,  15.5;   % Infeasible candidate
+    240, 14,  1.35, 1.8,  15.5;   % Infeasible candidate
 ];
 
 n_starts = size(starting_points, 1);
