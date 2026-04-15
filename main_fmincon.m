@@ -1,17 +1,30 @@
-clear; clc; close all;
-
+clear all; clear global; clc; close all;
 % Initial Vector [V, BPR, PR_fan, PR_LPC, PR_HPC]
 x0 = [230, 8.0, 1.55, 1.55, 22.0];
 
 lb = [200, 5.0, 1.1, 1.1, 8];
 ub = [235, 14.0, 1.7, 2.5, 25.0];
 
+% Load data
+data = A320data;
 
 x0_norm = normalize_vars(x0, lb, ub);
 
 lb_norm = zeros(size(x0_norm));
 ub_norm = ones(size(x0_norm));
 
+% MDA options
+mda_options.tol = 1e-3;
+mda_options.max_iter = 100;
+mda_options.verbose = false;
+
+global optHistory
+optHistory.iter   = [];
+optHistory.fval   = [];
+optHistory.x      = [];
+optHistory.constr = [];
+
+optHistory.count  = 0;
 
 % No constraints for now
 A = []; b = []; Aeq = []; beq = [];
@@ -24,27 +37,17 @@ optimizer_options = optimoptions('fmincon', ...
     'OptimalityTolerance', 1e-6, ...    % Don't chase "ghost" precision
     'ConstraintTolerance', 1e-5, ...    % Level of acceptable constraint violation
     'StepTolerance', 1e-6, ...          % Stop if x barely changes
+    'OutputFcn', @(x, optimValues, state) fmincon_history(x, optimValues, state, lb, ub, data, mda_options), ... % <--- FIXED LINE
     'UseParallel', false);              % KEEP FALSE if using global optHistory
 
-global optHistory
-optHistory.iter   = [];
-optHistory.fval   = [];
-optHistory.x      = [];
-optHistory.constr = [];
 
-optHistory.count  = 0;
 
-% MDA options
-mda_options.tol = 1e-3;
-mda_options.max_iter = 100;
-mda_options.verbose = false;
-
-% Load data
-data = A320data;
 
 % Run optimization
-[x_opt, f_opt] = fmincon(@(x) optim(x, lb, ub, data, mda_options), x0_norm, A, b, Aeq, beq, lb_norm, ub_norm,@(x) constraints(x, lb, ub, data, mda_options), optimizer_options);
-
+tic;
+[x_opt, f_opt, exitflag, output] = fmincon(@(x) optim(x, lb, ub, data, mda_options), x0_norm, A, b, Aeq, beq, lb_norm, ub_norm,@(x) constraints(x, lb, ub, data, mda_options), optimizer_options);
+elapsed_time = toc;
+  
 function x_real = denormalize_vars(x_norm, lb, ub)
     % Scales [0, 1] values back to physical units (for the MDA)
     x_real = x_norm .* (ub - lb) + lb;
@@ -174,4 +177,45 @@ if ~isempty(idx_fail)
     end
 else
     fprintf('\nNo design vectors found with fval = 1.\n');
+end
+
+fprintf('\nOptimization completed in %.2f seconds.\n', elapsed_time); 
+
+total_evals = output.funcCount;
+total_iters = output.iterations;
+
+fprintf('Total Iterations: %d\n', total_iters);
+fprintf('Total function Evaluations: %d\n', total_evals);
+
+% =========================================================================
+% OUTPUT FUNCTION FOR HISTORY TRACKING
+% =========================================================================
+% =========================================================================
+% OUTPUT FUNCTION FOR HISTORY TRACKING
+% =========================================================================
+function stop = fmincon_history(x_norm, optimValues, state, lb, ub, data, mda_options)
+    % This function is called by fmincon at every iteration
+    global optHistory
+    stop = false; % Do not stop the optimizer
+
+    % We only want to record data during the 'iter' state
+    if strcmp(state, 'iter')
+        
+        % Increment our safe counter
+        optHistory.count = optHistory.count + 1;
+        idx = optHistory.count;
+        
+        % 1. Save scalars directly to the new row
+        optHistory.iter(idx, 1) = optimValues.iteration;
+        optHistory.fval(idx, 1) = optimValues.fval;
+        
+        % 2. Denormalize x and FORCE it to be a 1x5 row vector
+        x_phys = x_norm(:)' .* (ub - lb) + lb; 
+        optHistory.x(idx, :) = x_phys;
+        
+        % 3. Re-evaluate constraints and FORCE to be a 1x3 row vector
+        [g_curr, ~] = constraints(x_norm, lb, ub, data, mda_options);
+        optHistory.constr(idx, :) = g_curr(:)'; 
+        
+    end
 end

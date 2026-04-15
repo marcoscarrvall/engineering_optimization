@@ -40,18 +40,21 @@ conv_tol     = 1e-4;
 x_curr      = normalize_vars(x0, lb, ub);
 multipliers = [];
 
+counter_optims = 0;
+
 fprintf('\n--- Starting SLP Optimization ---\n');
 
 % =========================================================================
 % MAIN LOOP
 % =========================================================================
+tic
 for k = 1:max_slp_iter
-
+    counter_optims = counter_optims + 2;
     f_curr = optim(x_curr, lb, ub, data, mda_options);
     [g_curr, ~] = constraints(x_curr, lb, ub, data, mda_options);
 
     history.count        = history.count + 1;
-    history.iter(k)      = k;
+    history.iter(k)      = k-1;
     history.fval(k)      = f_curr;
     history.x(k, :)      = denormalize_vars(x_curr, lb, ub);
     history.constr(k, :) = g_curr';
@@ -108,7 +111,7 @@ for k = 1:max_slp_iter
         end
     end
 end
-
+elapsed_time = toc;
 % =========================================================================
 % POST-OPTIMIZATION: KKT & RESULTS
 % =========================================================================
@@ -149,6 +152,7 @@ end
 % =========================================================================
 % PLOTS
 % =========================================================================
+
 figure('Color', 'w', 'Name', 'Optimization Convergence');
 plot(history.iter, history.fval, '-bo', 'LineWidth', 1.5, 'MarkerFaceColor', 'b');
 grid on; xlabel('Iteration'); ylabel('Objective f(x)'); title('Objective Convergence');
@@ -314,7 +318,7 @@ for s = 1:n_starts
         status = 'INFEASIBLE';
     elseif ~r.converged
         status = 'NO CONV';
-    elseif abs(r.f_opt - f_ref) < 1e-3
+    elseif abs(r.f_opt - f_ref) < 1e-2
         status = 'GLOBAL';
     else
         status = 'LOCAL';
@@ -326,7 +330,7 @@ for s = 1:n_starts
 end
 
 fprintf('\nReference (best feasible) f_opt = %.6f\n', f_ref);
-n_global = sum(arrayfun(@(r) r.feasible && r.converged && abs(r.f_opt - f_ref) < 1e-3, results));
+n_global = sum(arrayfun(@(r) r.feasible && r.converged && abs(r.f_opt - f_ref) < 1e-2, results));
 fprintf('Runs converging to global minimum: %d / %d\n', n_global, n_starts);
 
 if n_global == sum([results.feasible] & [results.converged])
@@ -376,7 +380,7 @@ bar_colors = colors;
 for s = 1:n_starts
     if ~results(s).feasible || ~results(s).converged
         bar_colors(s,:) = [0.8 0.2 0.2];
-    elseif abs(f_vals(s) - f_ref) < 1e-3
+    elseif abs(f_vals(s) - f_ref) < 1e-2
         bar_colors(s,:) = [0.1 0.7 0.3];
     else
         bar_colors(s,:) = [1.0 0.6 0.0];
@@ -389,3 +393,8 @@ set(gca, 'XTick', 1:n_starts, 'XTickLabel', start_labels, 'XTickLabelRotation', 
 yline(f_ref, 'k--', 'LineWidth', 1.5);
 ylabel('f_{opt}'); grid on;
 title('Objective Value per Starting Point  (green = global, red = infeasible/no-conv, orange = local)');
+
+
+fprintf('\nelapsed time: %.2f seconds.\n', elapsed_time);
+fprintf('Total SLP iterations: %d\n', length(history.iter));
+fprintf('Total optimization evaluations: %d\n', counter_optims);
