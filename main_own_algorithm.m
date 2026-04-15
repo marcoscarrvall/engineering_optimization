@@ -4,8 +4,8 @@ clear; clc; close all;
 % PROBLEM SETUP
 % =========================================================================
 x0 = [230, 8.0, 1.55, 1.55, 22.0];
-lb = [200, 5.0, 1.1, 1.1, 8];
-ub = [235, 14.0, 1.7, 5, 25.0];
+lb = [200, 5.0, 1.1, 1.1, 10.0];
+ub = [235, 14.0, 1.7, 2.0, 25.0];
 
 var_names        = {'V (m/s)', 'BPR', 'PR_{fan}', 'PR_{LPC}', 'PR_{HPC}'};
 constraint_names = {'Clearance', 'TIT Limit', 'Tip Mach'};
@@ -218,11 +218,11 @@ end
 % =========================================================================
 starting_points = [
     230, 8.0,  1.55, 1.55, 22.0;   % Original
-    200, 5.0,  1.1,  1.1,  8.0;    % Lower bounds
-    235, 14.0, 1.7,  5.0,  25.0;   % Upper bounds
-    210, 6.5,  1.2,  2.0,  12.0;   % Feasible low
-    225, 11.0, 1.6,  3.5,  20.0;   % Feasible mid-high
-    218, 9.5,  1.35, 4.2,  15.5;   % Infeasible candidate
+    200, 5.0,  1.1,  1.1,  10.0;    % Lower bounds
+    235, 14.0, 1.7,  2.0,  25.0;   % Upper bounds
+    210, 6.5,  1.2,  1.3,  12.0;   % Feasible low
+    225, 11.0, 1.6,  1.5,  20.0;   % Feasible mid-high
+    218, 9.5,  1.35, 1.8,  15.5;   % Infeasible candidate
 ];
 
 n_starts = size(starting_points, 1);
