@@ -10,6 +10,12 @@ ub = [235, 14.0, 1.7, 5, 25.0];
 var_names        = {'V (m/s)', 'BPR', 'PR_{fan}', 'PR_{LPC}', 'PR_{HPC}'};
 constraint_names = {'Clearance', 'TIT Limit', 'Tip Mach'};
 
+global optHistory
+optHistory.iter   = [];
+optHistory.fval   = [];
+optHistory.x      = [];
+optHistory.constr = [];
+
 global history
 history.iter   = [];
 history.fval   = [];
