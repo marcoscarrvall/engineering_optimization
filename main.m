@@ -20,7 +20,7 @@ optimizer_options = optimoptions('fmincon', ...
     'Algorithm', 'interior-point', ... % More stable than SQP for complex MDA
     'Display', 'iter-detailed', ...    % Gives you more info on why steps are taken
     'FiniteDifferenceType', 'central',... % Higher accuracy for gradients
-    'FiniteDifferenceStepSize', 1e-2, ... % Smaller, but still above MDA noise
+    'FiniteDifferenceStepSize', 5e-3, ... % Smaller, but still above MDA noise
     'OptimalityTolerance', 1e-6, ...    % Don't chase "ghost" precision
     'ConstraintTolerance', 1e-5, ...    % Level of acceptable constraint violation
     'StepTolerance', 1e-6, ...          % Stop if x barely changes
