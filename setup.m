@@ -10,3 +10,4 @@ fprintf('  constraints/\n');
 fprintf('  data/\n');
 fprintf('  disciplines/\n');
 fprintf('  tests/\n');
+fprintf('  simplified_problem/\n');
