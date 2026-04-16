@@ -59,7 +59,6 @@ plot(optHistory.iter, optHistory.fval, '-bo', 'LineWidth', 1.5, 'MarkerFaceColor
 xlim([0, max(optHistory.iter)]);
 grid on;
 ylabel('Objective f(x)');
-title('Objective Convergence');
 
 % --- Design Variable Evolution ---
 figure('Color', 'w', 'Name', 'Design Variable Evolution');
@@ -88,7 +87,6 @@ for v = 1:length(x0)
         set(gca, 'XTickLabel', []);
     end
 end
-sgtitle('Design Variable Evolution', 'FontWeight', 'bold', 'FontSize', 13);
 
 % --- Constraint History ---
 constraint_names = {'Clearance', 'TIT Limit', 'Tip Mach'};
@@ -103,7 +101,6 @@ if ~isempty(optHistory.constr) && ~isempty(optHistory.iter)
     grid on;
     ylabel('Value (c \leq 0)');
     xlabel('Evaluation Count');
-    title('Constraint Satisfaction');
     legend(h, constraint_names(1:size(optHistory.constr(1:n,:), 2)), 'Location', 'bestoutside');
 end
 
@@ -157,3 +154,146 @@ function stop = fmincon_history(x_norm, optimValues, state, lb, ub, data, mda_op
         optHistory.constr(idx, :) = g(:)';
     end
 end
+
+
+% =========================================================================
+% ROBUSTNESS TEST: MULTIPLE STARTING POINTS
+% =========================================================================
+starting_points = [
+    230, 8.0,  1.55, 1.55, 22.0;
+    200, 5.0,  1.1,  1.1,  10.0;
+    240, 14.0, 1.7,  2.0,  25.0;
+    210, 6.5,  1.2,  1.3,  12.0;
+    225, 11.0, 1.6,  1.5,  20.0;
+    240, 14.0, 1.35, 1.8,  15.5;
+];
+
+n_starts    = size(starting_points, 1);
+start_labels = {'Original', 'Lower Bounds', 'Upper Bounds', 'Feasible Low', 'Feasible Mid-High', 'Infeasible Candidate'};
+
+results(n_starts) = struct('x0', [], 'x_opt', [], 'f_opt', [], 'g_opt', [], ...
+                           'converged', false, 'feasible', false, 'iters', 0);
+
+fprintf('\n--- Robustness Test (%d starting points) ---\n', n_starts);
+
+for s = 1:n_starts
+    fprintf('\n[Run %d/%d] %s\n', s, n_starts, start_labels{s});
+    fprintf('  x0 = [%.1f, %.1f, %.2f, %.2f, %.1f]\n', starting_points(s,:));
+
+    x_s = normalize_vars(starting_points(s,:), lb, ub);
+
+    [x_opt_s, f_opt_s, exitflag_s, output_s] = fmincon( ...
+        @(x) optim(x, lb, ub, data, mda_options), ...
+        x_s, A, b, Aeq, beq, lb_norm, ub_norm, ...
+        @(x) constraints(x, lb, ub, data, mda_options), ...
+        optimizer_options);
+
+    x_opt_phys = denormalize_vars(x_opt_s, lb, ub);   % <-- fixed: use x_opt_s, not x_s
+
+    [g_opt, ~] = constraints(x_opt_s, lb, ub, data, mda_options);
+
+    results(s).x0        = starting_points(s,:);
+    results(s).x_opt     = x_opt_phys;
+    results(s).f_opt     = f_opt_s;                    % <-- fixed: use fmincon output directly
+    results(s).g_opt     = g_opt;
+    results(s).converged = exitflag_s > 0;             % <-- fixed: use exitflag from fmincon
+    results(s).feasible  = max(g_opt) <= 1e-4;
+    results(s).iters     = output_s.iterations;        % <-- fixed: use output struct from fmincon
+end
+
+% =========================================================================
+% RESULTS SUMMARY
+% =========================================================================
+fprintf('\n\n%s\n', repmat('=', 1, 95));
+fprintf('ROBUSTNESS TEST SUMMARY\n');
+fprintf('%s\n', repmat('=', 1, 95));
+fprintf('%-22s  %-7s  %-7s  %-7s  %-7s  %-7s  %-10s  %-10s  %-5s  %-9s\n', ...
+    'Start', 'V', 'BPR', 'PRfan', 'PRlpc', 'PRhpc', 'f_opt', 'max_g', 'Iters', 'Status');
+fprintf('%s\n', repmat('-', 1, 95));
+
+feasible_mask = [results.feasible];
+f_opts        = [results.f_opt];
+f_ref         = min(f_opts(feasible_mask));
+
+for s = 1:n_starts
+    r = results(s);
+    if ~r.feasible
+        status = 'INFEASIBLE';
+    elseif ~r.converged
+        status = 'NO CONV';
+    elseif abs(r.f_opt - f_ref) < 1e-2
+        status = 'GLOBAL';
+    else
+        status = 'LOCAL';
+    end
+
+    fprintf('%-22s  %-7.2f  %-7.2f  %-7.3f  %-7.3f  %-7.2f  %-10.6f  %-10.4f  %-5d  %-9s\n', ...
+        start_labels{s}, r.x_opt(1), r.x_opt(2), r.x_opt(3), r.x_opt(4), r.x_opt(5), ...
+        r.f_opt, max(r.g_opt), r.iters, status);
+end
+
+fprintf('\nBest feasible f_opt = %.6f\n', f_ref);
+n_global = sum(arrayfun(@(r) r.feasible && r.converged && abs(r.f_opt - f_ref) < 1e-2, results));
+fprintf('Runs at global minimum: %d / %d\n', n_global, n_starts);
+
+if n_global == sum(feasible_mask & [results.converged])
+    fprintf('Conclusion: Problem appears UNIMODAL.\n');
+else
+    fprintf('Conclusion: Problem appears MULTIMODAL — multiple local optima detected.\n');
+end
+
+% =========================================================================
+% PLOT 1: DESIGN VARIABLE OUTCOMES
+% =========================================================================
+figure('Color', 'w', 'Name', 'Robustness: Final Design Variables');
+x_matrix = reshape([results.x_opt], length(x0), n_starts)';
+colors   = lines(n_starts);
+
+for v = 1:length(x0)
+    subplot(length(x0), 1, v); hold on;
+
+    yline(lb(v),     '--', 'Color', [0.8 0.2 0.2], 'LineWidth', 1.0);
+    yline(ub(v),     '--', 'Color', [0.2 0.2 0.8], 'LineWidth', 1.0);
+    yline(x_opt(v),  '-',  'Color', [0.1 0.7 0.3], 'LineWidth', 1.5);
+
+    for s = 1:n_starts
+        if     ~results(s).feasible,  marker = 'x';
+        elseif ~results(s).converged, marker = 'd';
+        else,                         marker = 'o';
+        end
+        plot(s, x_matrix(s, v), marker, 'MarkerSize', 9, ...
+            'Color', colors(s,:), 'MarkerFaceColor', colors(s,:), 'LineWidth', 1.5);
+    end
+
+    ylabel(var_names{v}); grid on;
+    xlim([0.5, n_starts + 0.5]);
+    set(gca, 'XTick', 1:n_starts);
+    if v == length(x0)
+        set(gca, 'XTickLabel', start_labels, 'XTickLabelRotation', 15);
+    else
+        set(gca, 'XTickLabel', []);
+    end
+end
+
+% =========================================================================
+% PLOT 2: OBJECTIVE VALUES
+% =========================================================================
+figure('Color', 'w', 'Name', 'Robustness: Objective Values');
+
+bar_colors = zeros(n_starts, 3);
+for s = 1:n_starts
+    if ~results(s).feasible || ~results(s).converged
+        bar_colors(s,:) = [0.8 0.2 0.2];           % red   — failed
+    elseif abs(f_opts(s) - f_ref) < 1e-2
+        bar_colors(s,:) = [0.1 0.7 0.3];           % green — global
+    else
+        bar_colors(s,:) = [1.0 0.6 0.0];           % amber — local
+    end
+end
+
+b = bar(f_opts, 'FaceColor', 'flat');
+b.CData = bar_colors;
+yline(f_ref, 'k--', 'LineWidth', 1.5, 'Label', 'Global min', 'LabelVerticalAlignment', 'bottom');
+set(gca, 'XTick', 1:n_starts, 'XTickLabel', start_labels, 'XTickLabelRotation', 15);
+ylabel('f_{opt}');
+grid on;

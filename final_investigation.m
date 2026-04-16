@@ -14,7 +14,6 @@ mda_options.max_iter = 100;
 mda_options.verbose  = false;
 
 data = A320data();
-
 var_names = {'V', 'BPR', 'PR_{fan}', 'PR_{LPC}', 'PR_{HPC}'};
 units     = {'[m/s]', '[-]', '[-]', '[-]', '[-]'};
 con_names = {'Ground Clearance', 'Max TIT', 'Fan Tip Mach'};
@@ -41,8 +40,8 @@ for i = 1:5
         g_vals(j, :) = g';
     end
 
-    subplot(2, 3, i);
-
+    figure('Name', ['Boundedness: ', var_names{i}]);
+    set(gcf, 'Color', 'w');
     yyaxis left
     plot(x_test_phys, f_vals, 'b-', 'LineWidth', 1.5); hold on;
     plot(x0(i), f0, 'ko', 'MarkerFaceColor', 'b', 'MarkerSize', 8);
@@ -90,6 +89,7 @@ for r = 1:size(V_grid, 1)
 end
 
 figure('Name', 'Objective Contours with Feasible Boundary');
+set(gcf, 'Color', 'w');
 contour(V_grid, BPR_grid, G_max_grid, [0 0], 'r', 'LineWidth', 2); hold on;
 contour(V_grid, BPR_grid, F_grid, 20, 'LineWidth', 1.2);
 cb = colorbar('westoutside');
@@ -97,7 +97,6 @@ cb.Label.String = 'Objective Value f';
 plot(x0(1), x0(2), 'ko', 'MarkerFaceColor', 'w', 'MarkerSize', 8);
 xlabel('Velocity V [m/s]');
 ylabel('Bypass Ratio BPR [-]');
-title('Objective Contours with Feasible Boundary');
 legend('Feasible Boundary (g = 0)', 'Objective Contours', 'Initial Point', 'Location', 'northeast');
 grid on;
 
@@ -122,9 +121,9 @@ for i = 1:5
 
     x_phys_plot = x_test_norm .* (ub(i) - lb(i)) + lb(i);
 
-    subplot(2, 3, i);
+    figure('Name', ['Noise Scan: ', var_names{i}]);
+    set(gcf, 'Color', 'w');
     plot(x_phys_plot, f_noise, 'b-');
-    title(['Noise Scan: ', var_names{i}]);
     xlabel([var_names{i}, ' ', units{i}]);
     xlim([lb(i), ub(i)]);
     ylabel('Objective f');
@@ -157,16 +156,17 @@ for i = 1:n_vars
         dfdx_central(i, j) = (f_plus - f_minus)       / (2 * h);
     end
 
-    subplot(2, 3, i);
+    figure('Name', ['Step Size: ', var_names{i}]);
+    set(gcf, 'Color', 'w');
     loglog(h_range, abs(dfdx_forward(i, :)), 'r--', 'LineWidth', 1.1); hold on;
     loglog(h_range, abs(dfdx_central(i, :)), 'b-',  'LineWidth', 1.5);
     xline(1e-3, 'k:',  'MDA Tol',  'LabelVerticalAlignment', 'bottom');
     xline(5e-3, 'g--', 'Chosen h', 'LabelVerticalAlignment', 'bottom');
     grid on;
-    title(['Step Size: ', var_names{i}]);
     xlabel('Step size h');
     ylabel(['|df/d', var_names{i}, '|']);
     legend('Forward', 'Central', 'Location', 'best');
+    hold on;
 end
 
 % =========================================================================

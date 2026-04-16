@@ -15,13 +15,11 @@ function [g, h] = constraints(x, lb, ub, data, mda_options)
 
     if ~isempty(optHistory.fval)
         curr_idx = length(optHistory.fval);
-        % Store the constraint values corresponding to the latest objective evaluation
         optHistory.constr(curr_idx, :) = g';
     end
 
     h = []; 
     function x_real = denormalize_vars(x_norm, lb, ub)
-        % Scales [0, 1] values back to physical units (for the MDA)
         x_real = x_norm .* (ub - lb) + lb;
     end
 end
