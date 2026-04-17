@@ -1,4 +1,4 @@
-clear; clc; close all;
+clear all; clear global; clc; close all;
 
 % =========================================================================
 % PROBLEM SETUP
@@ -155,7 +155,7 @@ end
 
 figure('Color', 'w', 'Name', 'Optimization Convergence');
 plot(history.iter, history.fval, '-bo', 'LineWidth', 1.5, 'MarkerFaceColor', 'b');
-grid on; xlabel('Iteration'); ylabel('Objective f(x)'); title('Objective Convergence');
+grid on; xlabel('Iteration'); ylabel('Objective f(x)'); 
 
 figure('Color', 'w', 'Name', 'Design Variable Evolution', 'Position', [100, 100, 600, 800]);
 for v = 1:length(x0)
@@ -172,7 +172,6 @@ for v = 1:length(x0)
     ylabel(var_names{v}); grid on;
     if v == length(x0), xlabel('Iteration'); else, set(gca, 'XTickLabel', []); end
 end
-sgtitle('Design Variable Evolution', 'FontWeight', 'bold', 'FontSize', 13);
 
 figure('Color', 'w', 'Name', 'Constraint History');
 if ~isempty(history.constr) && ~isempty(history.iter)
@@ -180,7 +179,7 @@ if ~isempty(history.constr) && ~isempty(history.iter)
     h = plot(history.iter(1:minLen), history.constr(1:minLen, :), '-s', 'LineWidth', 1.2);
     hold on; yline(0, 'r--', 'LineWidth', 2);
     ylim([-0.2, 0.1]); grid on;
-    xlabel('Iteration'); ylabel('g(x)  [g \leq 0]'); title('Constraint Satisfaction');
+    xlabel('Iteration'); ylabel('g(x)  [g \leq 0]'); 
     legend(h, constraint_names(1:size(history.constr, 2)), 'Location', 'bestoutside');
 end
 
@@ -226,7 +225,7 @@ starting_points = [
     240, 14.0, 1.7,  2.0,  25.0;   % Upper bounds
     210, 6.5,  1.2,  1.3,  12.0;   % Feasible low
     225, 11.0, 1.6,  1.5,  20.0;   % Feasible mid-high
-    218, 9.5,  1.35, 1.8,  15.5;   % Infeasible candidate
+    240, 14,  1.35, 1.8,  15.5;   % Infeasible candidate
 ];
 
 n_starts = size(starting_points, 1);
@@ -372,7 +371,6 @@ for v = 1:length(x0)
     end
 end
 
-sgtitle('Final Design Variables per Starting Point', 'FontWeight', 'bold', 'FontSize', 13);
 
 figure('Color', 'w', 'Name', 'Robustness: Objective Values');
 f_vals = [results.f_opt];
@@ -392,7 +390,6 @@ b.CData = bar_colors;
 set(gca, 'XTick', 1:n_starts, 'XTickLabel', start_labels, 'XTickLabelRotation', 15);
 yline(f_ref, 'k--', 'LineWidth', 1.5);
 ylabel('f_{opt}'); grid on;
-title('Objective Value per Starting Point  (green = global, red = infeasible/no-conv, orange = local)');
 
 
 fprintf('\nelapsed time: %.2f seconds.\n', elapsed_time);

@@ -40,7 +40,7 @@ for iter = 1:max_iter
     end
 
     if rel_change > 0.1
-        fprintf("Warning: Divergence detected, range unchanged \n")
+        %fprintf("Warning: Divergence detected, range unchanged \n")
         state.objective = state.objective + 0.1*state.objective; 
         state.range=0;
         break
