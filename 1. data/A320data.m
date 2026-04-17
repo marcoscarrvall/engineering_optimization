@@ -1,6 +1,4 @@
-classdef A320data
-    % A320DATA Configuration constants for Airbus A320 Engine/Aircraft Analysis
-    
+classdef A320data    
     properties (Constant)
         name = "A320"
 

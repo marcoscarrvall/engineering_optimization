@@ -12,8 +12,8 @@ state.objective = 0;
 
 % Set fixed variables
 x(3) = 1.55; % Fan pressure ratio
-x(4) = 1.7; % LPC pressure ratio
-x(5) = 25.0; % HPC pressure ratio
+x(4) = 1.55; % LPC pressure ratio
+x(5) = 22; % HPC pressure ratio
 
 % Initialization 
 state = thermo(state, x, data.atm, data.thermo_data, data.ac, false);

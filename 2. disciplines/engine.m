@@ -31,7 +31,7 @@ function state = engine(state, x, atm, eng, ac, print_flag)
     n_fan = 1;
     n_lpc = PR_LPC / log(2.5);
     n_hpc = PR_HPC / log(46.4);
-    N_stages = n_fan + n_lpc + n_hpc;  % Note that we don't round this for now
+    N_stages = n_fan + n_lpc + n_hpc;  % We don't round this - physically wrong but acceptable for this model
     N_comp   = N_stages - 1;                 % LPC + HPC stages
 
     % 3.  ENGINE LENGTH BREAKDOWN

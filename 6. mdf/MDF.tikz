@@ -1,0 +1,163 @@
+
+%%% Preamble Requirements %%%
+% \usepackage{geometry}
+% \usepackage{amsfonts}
+% \usepackage{amsmath}
+% \usepackage{amssymb}
+% \usepackage{tikz}
+
+% Optional packages such as sfmath set through python interface
+% \usepackage{sfmath}
+
+% \usetikzlibrary{arrows,chains,positioning,scopes,shapes.geometric,shapes.misc,shadows}
+
+%%% End Preamble Requirements %%%
+
+\input{"C:/Program Files/Python312/Lib/site-packages/pyxdsm/diagram_styles"}
+\begin{tikzpicture}
+
+\matrix[MatrixSetup]{
+%Row 0
+&
+\node [DataIO] (output_opt) {$\begin{array}{c}V^0, BPR^0 \\ \Pi_\text{fan}^0, \Pi_\text{LPC}^0, \Pi_\text{HPC}^0\end{array}$};&
+\node [DataIO] (output_MDA) {$\begin{array}{c}MTOM_\text{ref} \\ D_\text{ref} \\ \eta_\text{fan, ref}\end{array}$};&
+\node [DataIO] (output_thermo) {$\begin{array}{c}T_0, p_0, R \\ \text{thermo. constants} \\ N_\text{eng}\end{array}$};&
+\node [DataIO] (output_engine) {$\begin{array}{c}T_0, R, \gamma \\ \rho_\text{mat}, W_\text{eng, ref}, \eta_\text{fan, ref} \\ N_\text{eng}, OEW_\text{ref} \\ W_\text{pay}, W_\text{fuel}\end{array}$};&
+\node [DataIO] (output_aero) {$\begin{array}{c}\rho_0 \\ D_\text{fan, ref}, L_\text{eng, ref} \\ C_\text{D, ref}, C_\text{Dpar, ref}, C_\text{L, ref} \\ AR, e, S_\text{ref}\end{array}$};&
+\node [DataIO] (output_obj) {$W_\text{fuel}$};&
+\node [DataIO] (output_con) {$\begin{array}{c}h_\text{eng} \\ \text{h}_\text{min} \\ M_\text{tip, max} \\ TIT_\text{max}\end{array}$};&
+\\
+%Row 1
+\node [DataIO] (left_output_opt) {$\begin{array}{c}V^*, BPR^* \\ \Pi_{fan}^*, \Pi_{LPC}^*, \Pi_{HPC}^*\end{array}$};&
+\node [Optimization] (opt) {$\begin{array}{c}0, 8 \rightarrow 1: \\ \text{Optimizer}\end{array}$};&
+&
+\node [DataInter] (opt-thermo) {$\begin{array}{c}V, BPR \\ \Pi_\text{fan}, \Pi_\text{LPC}, \Pi_\text{HPC}\end{array}$};&
+\node [DataInter] (opt-engine) {$\begin{array}{c}BPR, \Pi_\text{fan} \\ \Pi_\text{LPC}, \Pi_\text{HPC}\end{array}$};&
+\node [DataInter] (opt-aero) {$V$};&
+\node [DataInter] (opt-obj) {$V$};&
+&
+\\
+%Row 2
+&
+&
+\node [MDA] (MDA) {$\begin{array}{c}1, 5\rightarrow 2: \\ \text{MDA} \\ \text{Converger}\end{array}$};&
+\node [DataInter] (MDA-thermo) {$\hat{D}, \hat{\eta}_\text{fan}$};&
+&
+&
+&
+&
+\\
+%Row 3
+&
+&
+&
+\node [Function] (thermo) {$\begin{array}{c}2: \\ \text{Thermodynamics}\end{array}$};&
+\node [DataInter] (thermo-engine) {$\dot{m}_\text{tot}$};&
+&
+\node [DataInter] (thermo-obj) {$TSFC$};&
+\node [DataInter] (thermo-con) {$TIT$};&
+\\
+%Row 4
+&
+&
+\node [DataInter] (engine-MDA) {$\begin{array}{c}MTOM \\ \eta_\text{fan}\end{array}$};&
+&
+\node [Function] (engine) {$\begin{array}{c}3: \\ \text{Engine Sizing}\end{array}$};&
+\node [DataInter] (engine-aero) {$D_\text{fan}, L_\text{eng}, MTOM$};&
+\node [DataInter] (engine-obj) {$MTOM$};&
+\node [DataInter] (engine-con) {$\begin{array}{c}M_\text{tip} \\ D_\text{nacelle}\end{array}$};&
+\\
+%Row 5
+&
+&
+\node [DataInter] (aero-MDA) {$D$};&
+&
+&
+\node [Function] (aero) {$\begin{array}{c}4: \\ \text{Aerodynamics}\end{array}$};&
+\node [DataInter] (aero-obj) {$C_L/C_D$};&
+&
+\\
+%Row 6
+\node [DataIO] (left_output_obj) {$f^*$};&
+\node [DataInter] (obj-opt) {$f$};&
+&
+&
+&
+&
+\node [ImplicitFunction] (obj) {$\begin{array}{c}6: \\ \text{Obj. Function}\end{array}$};&
+&
+\\
+%Row 7
+\node [DataIO] (left_output_con) {$g_1^*, g_2^*, g_3^*$};&
+\node [DataInter] (con-opt) {$g$};&
+&
+&
+&
+&
+&
+\node [ImplicitFunction] (con) {$\begin{array}{c}7: \\ \text{Constraints}\end{array}$};&
+\\
+%Row 8
+&
+&
+&
+&
+&
+&
+&
+&
+\\
+};
+
+% XDSM process chains
+
+
+\begin{pgfonlayer}{data}
+\path
+% Horizontal edges
+(opt) edge [DataLine] (opt-thermo)
+(opt) edge [DataLine] (opt-engine)
+(opt) edge [DataLine] (opt-aero)
+(opt) edge [DataLine] (opt-obj)
+(MDA) edge [DataLine] (MDA-thermo)
+(engine) edge [DataLine] (engine-MDA)
+(aero) edge [DataLine] (aero-MDA)
+(thermo) edge [DataLine] (thermo-engine)
+(engine) edge [DataLine] (engine-aero)
+(thermo) edge [DataLine] (thermo-obj)
+(engine) edge [DataLine] (engine-obj)
+(aero) edge [DataLine] (aero-obj)
+(thermo) edge [DataLine] (thermo-con)
+(engine) edge [DataLine] (engine-con)
+(obj) edge [DataLine] (obj-opt)
+(con) edge [DataLine] (con-opt)
+(opt) edge [DataLine] (left_output_opt)
+(obj) edge [DataLine] (left_output_obj)
+(con) edge [DataLine] (left_output_con)
+% Vertical edges
+(opt-thermo) edge [DataLine] (thermo)
+(opt-engine) edge [DataLine] (engine)
+(opt-aero) edge [DataLine] (aero)
+(opt-obj) edge [DataLine] (obj)
+(MDA-thermo) edge [DataLine] (thermo)
+(engine-MDA) edge [DataLine] (MDA)
+(aero-MDA) edge [DataLine] (MDA)
+(thermo-engine) edge [DataLine] (engine)
+(engine-aero) edge [DataLine] (aero)
+(thermo-obj) edge [DataLine] (obj)
+(engine-obj) edge [DataLine] (obj)
+(aero-obj) edge [DataLine] (obj)
+(thermo-con) edge [DataLine] (con)
+(engine-con) edge [DataLine] (con)
+(obj-opt) edge [DataLine] (opt)
+(con-opt) edge [DataLine] (opt)
+(opt) edge [DataLine] (output_opt)
+(MDA) edge [DataLine] (output_MDA)
+(thermo) edge [DataLine] (output_thermo)
+(engine) edge [DataLine] (output_engine)
+(aero) edge [DataLine] (output_aero)
+(obj) edge [DataLine] (output_obj)
+(con) edge [DataLine] (output_con);
+\end{pgfonlayer}
+
+\end{tikzpicture}

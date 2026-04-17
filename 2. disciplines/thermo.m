@@ -104,7 +104,7 @@ state.TIT  = T04;
 state.TSFC = TSFC_val;
 state.mdot_total = mdot_one * N_eng;
 
-%% ---- 8.  Console output ------------------------------------------------
+%% ---- 8. Output ------------------------------------------------
 if print_flag
     fprintf('\n--- THERMO ---');
     fprintf('\n  mdot (total)    = %7.2f kg/s',     state.mdot_total);

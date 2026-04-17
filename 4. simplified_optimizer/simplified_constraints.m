@@ -15,7 +15,6 @@ function [g, h] = simplified_constraints(x, lb, ub, data, mda_options)
 
     if ~isempty(optHistory.fval)
         curr_idx = length(optHistory.fval);
-        % Store the constraint values corresponding to the latest objective evaluation
         optHistory.constr(curr_idx, :) = g';
     end
 

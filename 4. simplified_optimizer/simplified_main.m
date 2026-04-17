@@ -1,8 +1,6 @@
 clear; clc; close all;
 
-% =========================================================================
 % PROBLEM SETUP
-% =========================================================================
 x0 = [230, 8.0];
 lb = [200, 5.0];
 ub = [240, 14.0];
@@ -28,9 +26,7 @@ mda_options.max_iter = 100;
 mda_options.verbose  = false;
 data = A320data;
 
-% =========================================================================
 % SLP SETTINGS
-% =========================================================================
 max_slp_iter = 100;
 move_limit   = 0.1;
 M_penalty    = 1e6;
@@ -42,9 +38,7 @@ multipliers = [];
 
 fprintf('\n--- Starting SLP Optimization ---\n');
 
-% =========================================================================
 % MAIN LOOP
-% =========================================================================
 for k = 1:max_slp_iter
 
     f_curr = simplified_optim(x_curr, lb, ub, data, mda_options);
@@ -109,46 +103,70 @@ for k = 1:max_slp_iter
     end
 end
 
-% =========================================================================
 % POST-OPTIMIZATION: KKT & RESULTS
-% =========================================================================
-x_opt = denormalize_vars(x_curr, lb, ub);
-f_opt = simplified_optim(x_curr, lb, ub, data, mda_options);
-[g_opt, ~] = simplified_constraints(x_curr, lb, ub, data, mda_options);
+x_opt_norm = x_curr; 
+x_opt = denormalize_vars(x_opt_norm, lb, ub);
+f_opt = simplified_optim(x_opt_norm, lb, ub, data, mda_options);
+[g_opt, ~] = simplified_constraints(x_opt_norm, lb, ub, data, mda_options);
 
 fprintf('\n------------------------------------------------\n');
 fprintf('OPTIMAL DESIGN VARIABLES:\n');
 for i = 1:length(x_opt)
-    fprintf('%-10s: %8.3f\n', var_names{i}, x_opt(i));
+    fprintf('%-10s: %8.4f\n', var_names{i}, x_opt(i));
 end
-fprintf('Optimal Objective: %.6f\n', f_opt);
+fprintf('Optimal Objective f(x*): %.6f\n', f_opt);
 fprintf('------------------------------------------------\n');
 
-[grad_f, grad_g] = get_gradients(x_curr, lb, ub, data, mda_options, h_step);
+[grad_f, grad_g] = get_gradients(x_opt_norm, lb, ub, data, mda_options, h_step);
 
-fprintf('\n--- KKT Condition Verification ---\n');
-fprintf('Complementary Slackness:\n');
+active_tol = 1e-4; 
+active_idx = find(abs(g_opt) < active_tol);
+inactive_idx = find(g_opt <= -active_tol);
+
+fprintf('\n--- KKT Condition Verification (Exercise 5 Method) ---\n');
+fprintf('Step 1: Activity Check \n');
 for j = 1:length(g_opt)
-    fprintf('  %s: g = %8.4f, lambda = %8.4f\n', constraint_names{j}, g_opt(j), multipliers(j));
+    status = 'INACTIVE';
+    if ismember(j, active_idx), status = 'ACTIVE'; end
+    fprintf('  %s: g = %10.6f (%s)\n', constraint_names{j}, g_opt(j), status);
 end
 
-combined_grad = grad_f(:);
-for j = 1:length(multipliers)
-    combined_grad = combined_grad + multipliers(j) * grad_g(j, :)';
-end
+if ~isempty(active_idx)
+    A_kkt = grad_g(active_idx, :)'; 
+    b_kkt = -grad_f(:);
+    
+    mu_active = A_kkt \ b_kkt;
+    
+    mu_full = zeros(length(g_opt), 1);
+    mu_full(active_idx) = mu_active;
+    
+    fprintf('\nStep 2: Lagrange Multipliers (mu)\n');
+    for j = 1:length(g_opt)
+        fprintf('  mu_%d (%s): %10.6f\n', j, constraint_names{j}, mu_full(j));
+    end
+    
+    gradL = grad_f(:);
+    for i = 1:length(active_idx)
+        idx = active_idx(i);
+        gradL = gradL + mu_full(idx) * grad_g(idx, :)';
+    end
+    stat_residual = norm(gradL);
 
-stationarity_error = norm(combined_grad);
-fprintf('\nStationarity Error ||grad L||: %.6f\n', stationarity_error);
-
-if stationarity_error < 0.10
-    fprintf('KKT Status: Satisfied.\n');
+    if stat_residual < 1e-3 && all(mu_full(active_idx) >= -1e-6)
+    fprintf('KKT Status: Satisfied. x* is a valid constrained optimum.\n');
+    else
+        fprintf('KKT Status: NOT satisfied. Check mu signs or stationarity¡.\n');
+    end
 else
-    fprintf('KKT Status: Not fully satisfied.\n');
+    fprintf('\nNo active constraints found to compute mu.\n');
+    stat_residual = norm(grad_f);
 end
 
-% =========================================================================
+fprintf('\nStationary Residual: %.2e \n', stat_residual);
+
+
+
 % PLOTS
-% =========================================================================
 figure('Color', 'w', 'Name', 'Optimization Convergence');
 plot(history.iter, history.fval, '-bo', 'LineWidth', 1.5, 'MarkerFaceColor', 'b');
 grid on; xlabel('Iteration'); ylabel('Objective f(x)'); title('Objective Convergence');
@@ -205,9 +223,9 @@ hold on; grid on;
 [C, h_cont] = contour(V_grid, BPR_grid, Z_objective, 15, 'k', 'LineWidth', 1.2);
 clabel(C, h_cont, 'FontSize', 9, 'Color', 'k', 'LabelSpacing', 200);
 
-[C1, h1] = contour(V_grid, BPR_grid, G1_clearance, [0 0], 'g', 'LineWidth', 2.5);
-[C2, h2] = contour(V_grid, BPR_grid, G2_tit,       [0 0], 'b', 'LineWidth', 2.5);
-[C3, h3] = contour(V_grid, BPR_grid, G3_mach,      [0 0], 'c', 'LineWidth', 2.5);
+[C1, h1] = contour(V_grid, BPR_grid, G1_clearance, [0 0], 'g', 'LineWidth', 1.5);
+[C2, h2] = contour(V_grid, BPR_grid, G2_tit,       [0 0], 'b', 'LineWidth', 1.5);
+[C3, h3] = contour(V_grid, BPR_grid, G3_mach,      [0 0], 'c', 'LineWidth', 1.5);
 
 plot(history.x(:,1), history.x(:,2), 'r-o', 'LineWidth', 1.5, 'MarkerFaceColor', 'r', "MarkerSize", 4); % Optimization path
 plot(history.x(1,1), history.x(1,2), 'gs', 'MarkerSize', 8, 'LineWidth', 2); % Start
@@ -216,7 +234,7 @@ plot(x_opt(1), x_opt(2), 'm*', 'MarkerSize', 8, 'LineWidth', 2); % Optimum
 xlabel('Velocity (V)');
 ylabel('Bypass Ratio (BPR)');
 
-legend([h1, h2, h3], {'Clearance Limit (g=0)', 'TIT Limit (g=0)', 'Mach Limit (g=0)'}, ...
+legend("Objective", "Clearance Limit (g=0)", "TIT Limit (g=0)", "Mach Limit (g=0)", "Optimization Path", ...
        'Location', 'northeastoutside');
 axis([lb(1) ub(1) lb(2) ub(2)]);
 
